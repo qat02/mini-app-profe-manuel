@@ -68,35 +68,30 @@ function App() {
           gif: '/section-directores.gif',
           title: 'Directores',
           description: 'GPTs y herramientas pensadas para el trabajo directivo escolar.',
-          cardClass: 'card-directores',
         };
       case 'docentes':
         return {
           gif: '/section-docentes.gif',
           title: 'Docentes',
           description: 'Recursos y GPTs útiles para la práctica diaria en el aula.',
-          cardClass: 'card-docentes',
         };
       case 'iaapps':
         return {
           gif: '/section-iaapps.gif',
           title: 'IA Apps',
           description: 'Aplicaciones de inteligencia artificial útiles para crear, organizar y producir.',
-          cardClass: 'card-iaapps',
         };
       case 'recursos':
         return {
           gif: '/section-recursos.gif',
           title: 'Recursos',
           description: 'Materiales, documentos y apoyos listos para consultar o descargar.',
-          cardClass: 'card-recursos',
         };
       default:
         return {
           gif: '',
           title: '',
           description: '',
-          cardClass: '',
         };
     }
   };
