@@ -68,38 +68,60 @@ function App() {
           gif: '/section-directores.gif',
           title: 'Directores',
           description: 'GPTs y herramientas pensadas para el trabajo directivo escolar.',
+          cardClass: 'card-directores',
         };
       case 'docentes':
         return {
           gif: '/section-docentes.gif',
           title: 'Docentes',
           description: 'Recursos y GPTs útiles para la práctica diaria en el aula.',
+          cardClass: 'card-docentes',
         };
       case 'iaapps':
         return {
           gif: '/section-iaapps.gif',
           title: 'IA Apps',
           description: 'Aplicaciones de inteligencia artificial útiles para crear, organizar y producir.',
+          cardClass: 'card-iaapps',
         };
       case 'recursos':
         return {
           gif: '/section-recursos.gif',
           title: 'Recursos',
           description: 'Materiales, documentos y apoyos listos para consultar o descargar.',
+          cardClass: 'card-recursos',
         };
       default:
         return {
           gif: '',
           title: '',
           description: '',
+          cardClass: '',
         };
     }
   };
 
   const headerContent = getHeaderContent();
 
+  const getCardClass = () => {
+    switch (screen) {
+      case 'directores':
+        return 'card-directores';
+      case 'docentes':
+        return 'card-docentes';
+      case 'iaapps':
+        return 'card-iaapps';
+      case 'recursos':
+        return 'card-recursos';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="app-shell">
+      <div className="page-glow"></div>
+
       <div className="social-float-group">
         <a
           href="https://www.facebook.com/ElProfeManuell/"
@@ -132,7 +154,7 @@ function App() {
         </a>
       </div>
 
-      <div className={`top-header ${getHeaderClass()}`}>
+      <div className={`top-header ${getHeaderClass()} fade-up`}>
         {screen === 'home' ? (
           <>
             <img src="/logo512.png" alt="Logo Profe Manuel" className="top-logo top-logo-home" />
@@ -153,46 +175,61 @@ function App() {
         )}
       </div>
 
-      <main className="main-content">
+      <main className="main-content fade-up">
         {screen === 'home' && (
           <div className="home-grid">
             <div className="section-card blue" onClick={() => setScreen('directores')}>
               <img src="/directores.png" alt="Directores" className="section-card-image" />
-              <h3>Directores</h3>
+              <div className="section-card-body">
+                <h3>Directores</h3>
+                <p>Gestión escolar y organización directiva.</p>
+              </div>
             </div>
 
             <div className="section-card green" onClick={() => setScreen('docentes')}>
               <img src="/docentes.png" alt="Docentes" className="section-card-image" />
-              <h3>Docentes</h3>
+              <div className="section-card-body">
+                <h3>Docentes</h3>
+                <p>Planeación, apoyo y recursos para el aula.</p>
+              </div>
             </div>
 
             <div className="section-card purple" onClick={() => setScreen('iaapps')}>
               <img src="/appsIA.png" alt="IA Apps" className="section-card-image" />
-              <h3>IA Apps</h3>
+              <div className="section-card-body">
+                <h3>IA Apps</h3>
+                <p>Apps útiles para crear, organizar y producir.</p>
+              </div>
             </div>
 
             <div className="section-card orange" onClick={() => setScreen('recursos')}>
               <img src="/recursos.png" alt="Recursos" className="section-card-image" />
-              <h3>Recursos</h3>
+              <div className="section-card-body">
+                <h3>Recursos</h3>
+                <p>Materiales, documentos y apoyos listos.</p>
+              </div>
             </div>
 
             <div className="section-card gray disabled-card">
               <img src="/otros.png" alt="Próximamente" className="section-card-image" />
-              <h3>Próximamente</h3>
+              <div className="section-card-body">
+                <h3>Próximamente</h3>
+                <p>Más herramientas y materiales en camino.</p>
+              </div>
             </div>
           </div>
         )}
 
         {screen === 'directores' && (
           <div className="cards-grid compact-grid">
-            <div className="card" onClick={() => openLink('#')}>
+            <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
               <img src="/documentia.png" alt="DocumentIA" className="card-image" />
               <h3>DocumentIA</h3>
               <p>Próximamente.</p>
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://chatgpt.com/g/g-68ddeab176ac8191b035788b7075ace6-protocolia-por-el-profe-manuel'
@@ -205,7 +242,7 @@ function App() {
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://chatgpt.com/g/g-68d4988dac0c8191aab561ddce214c27-pmcia-por-el-profe-manuel'
@@ -218,7 +255,7 @@ function App() {
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://drive.google.com/drive/folders/1eqaJUokhLa4AIuYXFncjPsS-lcVHEShs?usp=drive_link'
@@ -235,7 +272,7 @@ function App() {
         {screen === 'docentes' && (
           <div className="cards-grid compact-grid">
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink('https://chatgpt.com/g/g-68f2629b029c819181014a27162d44da-programia')
               }
@@ -246,7 +283,7 @@ function App() {
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://chatgpt.com/g/g-691241908c3881918a4bb238304d10fc-proyectia-por-el-profe-manuel'
@@ -258,7 +295,7 @@ function App() {
               <p>Proyectos interdisciplinarios y STEAM.</p>
             </div>
 
-            <div className="card" onClick={() => openLink('#')}>
+            <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
               <img src="/otros.png" alt="Otros" className="card-image" />
               <h3>Otros</h3>
               <p>Próximamente.</p>
@@ -268,19 +305,28 @@ function App() {
 
         {screen === 'iaapps' && (
           <div className="cards-grid compact-grid">
-            <div className="card" onClick={() => openLink('https://notebooklm.google.com/')}>
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() => openLink('https://notebooklm.google.com/')}
+            >
               <img src="/notebooklm.png" alt="NotebookLM" className="card-image" />
               <h3>NotebookLM</h3>
               <p>Organización y análisis de documentos.</p>
             </div>
 
-            <div className="card" onClick={() => openLink('https://gamma.app/es')}>
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() => openLink('https://gamma.app/es')}
+            >
               <img src="/gamma.png" alt="Gamma" className="card-image" />
               <h3>Gamma</h3>
               <p>Presentaciones con IA.</p>
             </div>
 
-            <div className="card" onClick={() => openLink('https://suno.com/create')}>
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() => openLink('https://suno.com/create')}
+            >
               <img src="/suno.png" alt="Suno" className="card-image" />
               <h3>Suno</h3>
               <p>Música y canciones con IA.</p>
@@ -291,7 +337,7 @@ function App() {
         {screen === 'recursos' && (
           <div className="cards-grid compact-grid">
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://drive.google.com/file/d/1zA_hlSMTnHJZhcj_o7iNxBqwKvAPKlnF/view?usp=drive_link'
@@ -304,7 +350,7 @@ function App() {
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://drive.google.com/file/d/1DFun0axYjCxHe0Ze4DXhEbmgUVUrCAoE/view?usp=drive_link'
@@ -321,7 +367,7 @@ function App() {
             </div>
 
             <div
-              className="card"
+              className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
                   'https://drive.google.com/drive/folders/1eqaJUokhLa4AIuYXFncjPsS-lcVHEShs?usp=drive_link'
