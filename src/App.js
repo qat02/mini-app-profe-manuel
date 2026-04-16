@@ -1,8 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
   const [screen, setScreen] = useState('home');
+
+  useEffect(() => {
+    const imagesToPreload = [
+      '/section-directores.gif',
+      '/section-docentes.gif',
+      '/section-iaapps.gif',
+      '/section-recursos.gif',
+      '/nav-directores.gif',
+      '/nav-docentes.gif',
+      '/nav-home.gif',
+      '/nav-iaapps.gif',
+      '/nav-recursos.gif',
+      '/logo512.png',
+      '/directores.png',
+      '/docentes.png',
+      '/appsIA.png',
+      '/recursos.png',
+      '/otros.png',
+      '/documentia.png',
+      '/protocolia.png',
+      '/pmcia.png',
+      '/programia.png',
+      '/proyectia.png',
+      '/notebooklm.png',
+      '/gamma.png',
+      '/suno.png',
+      '/kahoot.png',
+      '/manual de protocolos.png',
+      '/12temascte.png',
+    ];
+
+    imagesToPreload.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const openLink = (url) => {
     if (url && url !== '#') {
@@ -148,7 +184,7 @@ function App() {
         )}
 
         {screen === 'directores' && (
-          <div className="cards-grid">
+          <div className="cards-grid compact-grid">
             <div className="card" onClick={() => openLink('#')}>
               <img src="/documentia.png" alt="DocumentIA" className="card-image" />
               <h3>DocumentIA</h3>
@@ -197,7 +233,7 @@ function App() {
         )}
 
         {screen === 'docentes' && (
-          <div className="cards-grid">
+          <div className="cards-grid compact-grid">
             <div
               className="card"
               onClick={() =>
@@ -231,7 +267,7 @@ function App() {
         )}
 
         {screen === 'iaapps' && (
-          <div className="cards-grid">
+          <div className="cards-grid compact-grid">
             <div className="card" onClick={() => openLink('https://notebooklm.google.com/')}>
               <img src="/notebooklm.png" alt="NotebookLM" className="card-image" />
               <h3>NotebookLM</h3>
@@ -253,7 +289,7 @@ function App() {
         )}
 
         {screen === 'recursos' && (
-          <div className="cards-grid">
+          <div className="cards-grid compact-grid">
             <div
               className="card"
               onClick={() =>
