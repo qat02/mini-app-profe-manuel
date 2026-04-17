@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
 function App() {
   const [screen, setScreen] = useState('home');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const imagesToPreload = [
@@ -113,6 +114,131 @@ function App() {
     }
   };
 
+  const searchItems = useMemo(
+    () => [
+      {
+        title: 'Directores',
+        description: 'Gestión escolar y organización directiva.',
+        image: '/directores.png',
+        action: () => setScreen('directores'),
+      },
+      {
+        title: 'Docentes',
+        description: 'Planeación, apoyo y recursos para el aula.',
+        image: '/docentes.png',
+        action: () => setScreen('docentes'),
+      },
+      {
+        title: 'IA Apps',
+        description: 'Apps útiles para crear, organizar y producir.',
+        image: '/appsIA.png',
+        action: () => setScreen('iaapps'),
+      },
+      {
+        title: 'Recursos',
+        description: 'Materiales, documentos y apoyos listos.',
+        image: '/recursos.png',
+        action: () => setScreen('recursos'),
+      },
+      {
+        title: 'ProtocolIA',
+        description: 'Protocolos escolares y rutas de atención.',
+        image: '/protocolia.png',
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-68ddeab176ac8191b035788b7075ace6-protocolia-por-el-profe-manuel'
+          ),
+      },
+      {
+        title: 'PMCIA',
+        description: 'Proceso de Mejora Continua con inteligencia artificial.',
+        image: '/pmcia.png',
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-68d4988dac0c8191aab561ddce214c27-pmcia-por-el-profe-manuel'
+          ),
+      },
+      {
+        title: 'ProgramIA',
+        description: 'Planeación y programa analítico.',
+        image: '/programia.png',
+        action: () =>
+          openLink('https://chatgpt.com/g/g-68f2629b029c819181014a27162d44da-programia'),
+      },
+      {
+        title: 'ProyectIA',
+        description: 'Proyectos interdisciplinarios y STEAM.',
+        image: '/proyectia.png',
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-691241908c3881918a4bb238304d10fc-proyectia-por-el-profe-manuel'
+          ),
+      },
+      {
+        title: 'NotebookLM',
+        description: 'Organización y análisis de documentos.',
+        image: '/notebooklm.png',
+        action: () => openLink('https://notebooklm.google.com/'),
+      },
+      {
+        title: 'Gamma',
+        description: 'Presentaciones con IA.',
+        image: '/gamma.png',
+        action: () => openLink('https://gamma.app/es'),
+      },
+      {
+        title: 'Suno',
+        description: 'Música y canciones con IA.',
+        image: '/suno.png',
+        action: () => openLink('https://suno.com/create'),
+      },
+      {
+        title: 'Kahoot',
+        description: 'Materiales y recursos descargables.',
+        image: '/kahoot.png',
+        action: () =>
+          openLink(
+            'https://drive.google.com/file/d/1zA_hlSMTnHJZhcj_o7iNxBqwKvAPKlnF/view?usp=drive_link'
+          ),
+      },
+      {
+        title: 'Manual de Protocolos',
+        description: 'Consulta rápida y descarga.',
+        image: '/manual de protocolos.png',
+        action: () =>
+          openLink(
+            'https://drive.google.com/file/d/1DFun0axYjCxHe0Ze4DXhEbmgUVUrCAoE/view?usp=drive_link'
+          ),
+      },
+      {
+        title: '12 Temas del CTE',
+        description: 'Carpeta con materiales y recursos del CTE.',
+        image: '/12temascte.png',
+        action: () =>
+          openLink(
+            'https://drive.google.com/drive/folders/1eqaJUokhLa4AIuYXFncjPsS-lcVHEShs?usp=drive_link'
+          ),
+      },
+      {
+        title: 'DocumentIA',
+        description: 'Próximamente.',
+        image: '/documentia.png',
+        action: () => {},
+      },
+    ],
+    []
+  );
+
+  const filteredSearchItems = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return [];
+    return searchItems.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        item.description.toLowerCase().includes(term)
+    );
+  }, [searchItems, searchTerm]);
+
   return (
     <div className="app-shell">
       <div className="page-glow"></div>
@@ -153,9 +279,19 @@ function App() {
         {screen === 'home' ? (
           <>
             <img src="/logo512.png" alt="Logo Profe Manuel" className="top-logo top-logo-home" />
-            <p className="home-mini-description">
-              Aquí encontrarás herramientas, recursos y apoyos útiles para directores y docentes.
-            </p>
+
+            <div className="search-bar-wrapper">
+              <div className="search-bar">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Buscar recurso, app o herramienta"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+            </div>
           </>
         ) : (
           <>
@@ -172,47 +308,67 @@ function App() {
 
       <main className="main-content fade-up">
         {screen === 'home' && (
-          <div className="home-grid">
-            <div className="section-card blue" onClick={() => setScreen('directores')}>
-              <img src="/directores.png" alt="Directores" className="section-card-image" />
-              <div className="section-card-body">
-                <h3>Directores</h3>
-                <p>Gestión escolar y organización directiva.</p>
+          <>
+            {searchTerm.trim() !== '' ? (
+              <div className="cards-grid compact-grid search-results-grid">
+                {filteredSearchItems.length > 0 ? (
+                  filteredSearchItems.map((item, index) => (
+                    <div key={index} className="card card-home-search" onClick={item.action}>
+                      <img src={item.image} alt={item.title} className="card-image" />
+                      <h3>{item.title}</h3>
+                      <p>{item.description}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-results">
+                    <p>No encontré coincidencias con esa búsqueda.</p>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="home-grid">
+                <div className="section-card blue" onClick={() => setScreen('directores')}>
+                  <img src="/directores.png" alt="Directores" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>Directores</h3>
+                    <p>Gestión escolar y organización directiva.</p>
+                  </div>
+                </div>
 
-            <div className="section-card green" onClick={() => setScreen('docentes')}>
-              <img src="/docentes.png" alt="Docentes" className="section-card-image" />
-              <div className="section-card-body">
-                <h3>Docentes</h3>
-                <p>Planeación, apoyo y recursos para el aula.</p>
-              </div>
-            </div>
+                <div className="section-card green" onClick={() => setScreen('docentes')}>
+                  <img src="/docentes.png" alt="Docentes" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>Docentes</h3>
+                    <p>Planeación, apoyo y recursos para el aula.</p>
+                  </div>
+                </div>
 
-            <div className="section-card purple" onClick={() => setScreen('iaapps')}>
-              <img src="/appsIA.png" alt="IA Apps" className="section-card-image" />
-              <div className="section-card-body">
-                <h3>IA Apps</h3>
-                <p>Apps útiles para crear, organizar y producir.</p>
-              </div>
-            </div>
+                <div className="section-card purple" onClick={() => setScreen('iaapps')}>
+                  <img src="/appsIA.png" alt="IA Apps" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>IA Apps</h3>
+                    <p>Apps útiles para crear, organizar y producir.</p>
+                  </div>
+                </div>
 
-            <div className="section-card orange" onClick={() => setScreen('recursos')}>
-              <img src="/recursos.png" alt="Recursos" className="section-card-image" />
-              <div className="section-card-body">
-                <h3>Recursos</h3>
-                <p>Materiales, documentos y apoyos listos.</p>
-              </div>
-            </div>
+                <div className="section-card orange" onClick={() => setScreen('recursos')}>
+                  <img src="/recursos.png" alt="Recursos" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>Recursos</h3>
+                    <p>Materiales, documentos y apoyos listos.</p>
+                  </div>
+                </div>
 
-            <div className="section-card gray disabled-card">
-              <img src="/otros.png" alt="Próximamente" className="section-card-image" />
-              <div className="section-card-body">
-                <h3>Próximamente</h3>
-                <p>Más herramientas y materiales en camino.</p>
+                <div className="section-card gray disabled-card">
+                  <img src="/otros.png" alt="Próximamente" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>Próximamente</h3>
+                    <p>Más herramientas y materiales en camino.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
         {screen === 'directores' && (
