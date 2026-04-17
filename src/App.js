@@ -240,6 +240,23 @@ function App() {
               className={`card ${getCardClass()}`}
               onClick={() =>
                 openLink(
+                  'https://drive.google.com/file/d/1DFun0axYjCxHe0Ze4DXhEbmgUVUrCAoE/view?usp=drive_link'
+                )
+              }
+            >
+              <img
+                src="/manual de protocolos.png"
+                alt="Manual de Protocolos"
+                className="card-image"
+              />
+              <h3>Manual de Protocolos</h3>
+              <p>Consulta rápida y descarga.</p>
+            </div>
+
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() =>
+                openLink(
                   'https://chatgpt.com/g/g-68d4988dac0c8191aab561ddce214c27-pmcia-por-el-profe-manuel'
                 )
               }
