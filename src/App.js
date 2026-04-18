@@ -221,9 +221,12 @@ function App() {
       },
       {
         title: 'DocumentIA',
-        description: 'Próximamente.',
+        description: 'Actas, exhortos y documentos escolares.',
         image: '/documentia.png',
-        action: () => {},
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-69e3bdd04f8081919a1b6ba9af0c41de-documentia-por-el-profe-manuel'
+          ),
       },
     ],
     []
@@ -373,10 +376,17 @@ function App() {
 
         {screen === 'directores' && (
           <div className="cards-grid compact-grid">
-            <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() =>
+                openLink(
+                  'https://chatgpt.com/g/g-69e3bdd04f8081919a1b6ba9af0c41de-documentia-por-el-profe-manuel'
+                )
+              }
+            >
               <img src="/documentia.png" alt="DocumentIA" className="card-image" />
               <h3>DocumentIA</h3>
-              <p>Próximamente.</p>
+              <p>Exhortos, actas de hechos y administrativas.</p>
             </div>
 
             <div
@@ -389,7 +399,7 @@ function App() {
             >
               <img src="/protocolia.png" alt="ProtocolIA" className="card-image" />
               <h3>ProtocolIA</h3>
-              <p>Protocolos escolares y rutas de atención.</p>
+              <p>Protocolos escolares y rutas de actuación.</p>
             </div>
 
             <div
@@ -406,7 +416,7 @@ function App() {
                 className="card-image"
               />
               <h3>Manual de Protocolos</h3>
-              <p>Consulta rápida y descarga.</p>
+              <p>Consulta la ruta de actuación.</p>
             </div>
 
             <div
@@ -419,7 +429,7 @@ function App() {
             >
               <img src="/pmcia.png" alt="PMCIA" className="card-image" />
               <h3>PMCIA</h3>
-              <p>Proceso de Mejora Continua con inteligencia artificial.</p>
+              <p>Proceso de Mejora Continua con IA.</p>
             </div>
 
             <div
@@ -447,7 +457,7 @@ function App() {
             >
               <img src="/programia.png" alt="ProgramIA" className="card-image" />
               <h3>ProgramIA</h3>
-              <p>Planeación y programa analítico.</p>
+              <p>Planeación del Programa Analítico</p>
             </div>
 
             <div
@@ -460,7 +470,7 @@ function App() {
             >
               <img src="/proyectia.png" alt="ProyectIA" className="card-image" />
               <h3>ProyectIA</h3>
-              <p>Proyectos interdisciplinarios y STEAM.</p>
+              <p>Planeación por Metodologìas de Proyectos.</p>
             </div>
 
             <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
@@ -479,7 +489,7 @@ function App() {
             >
               <img src="/notebooklm.png" alt="NotebookLM" className="card-image" />
               <h3>NotebookLM</h3>
-              <p>Organización y análisis de documentos.</p>
+              <p>Generador de Presentaciones, infografias y videos con IA.</p>
             </div>
 
             <div
@@ -488,7 +498,7 @@ function App() {
             >
               <img src="/gamma.png" alt="Gamma" className="card-image" />
               <h3>Gamma</h3>
-              <p>Presentaciones con IA.</p>
+              <p>Generador de presentaciones con IA.</p>
             </div>
 
             <div
@@ -497,7 +507,7 @@ function App() {
             >
               <img src="/suno.png" alt="Suno" className="card-image" />
               <h3>Suno</h3>
-              <p>Música y canciones con IA.</p>
+              <p>Generador de mùsica y canciones con IA</p>
             </div>
           </div>
         )}
@@ -514,7 +524,7 @@ function App() {
             >
               <img src="/kahoot.png" alt="Kahoot" className="card-image" />
               <h3>Kahoot</h3>
-              <p>Materiales y recursos descargables.</p>
+              <p>Quizzes que ponen a pruba el aprendizaje.</p>
             </div>
 
             <div
@@ -531,7 +541,7 @@ function App() {
                 className="card-image"
               />
               <h3>Manual de Protocolos</h3>
-              <p>Consulta rápida y descarga.</p>
+              <p>Consulta la ruta de actuaciòn sugerida.</p>
             </div>
 
             <div
