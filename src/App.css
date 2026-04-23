@@ -177,6 +177,51 @@ body {
   background: rgba(108, 99, 255, 0.92);
 }
 
+.messenger-bubble {
+  position: fixed;
+  right: 14px;
+  bottom: 112px;
+  z-index: 1001;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #0084ff 0%, #006df0 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  box-shadow: 0 12px 26px rgba(0, 91, 187, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.messenger-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(0, 91, 187, 0.32);
+}
+
+.messenger-bubble:active {
+  transform: scale(0.97);
+}
+
+.messenger-bubble-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.messenger-bubble-text {
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .main-content {
   position: relative;
   z-index: 1;
@@ -503,6 +548,16 @@ body {
   .social-float {
     width: 28px;
     height: 28px;
+    font-size: 0.78rem;
+  }
+
+  .messenger-bubble {
+    right: 12px;
+    bottom: 108px;
+    padding: 9px 12px;
+  }
+
+  .messenger-bubble-text {
     font-size: 0.78rem;
   }
 

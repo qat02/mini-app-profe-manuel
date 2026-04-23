@@ -159,6 +159,15 @@ function App() {
           ),
       },
       {
+        title: 'Ruta de Actividades',
+        description: 'GPT para organizar actividades y dar seguimiento al trabajo.',
+        image: '/pmcia.png',
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-68d4988dac0c8191aab561ddce214c27-pmcia-por-el-profe-manuel'
+          ),
+      },
+      {
         title: 'ProgramIA',
         description: 'Planeación y programa analítico.',
         image: '/programia.png',
@@ -172,6 +181,15 @@ function App() {
         action: () =>
           openLink(
             'https://chatgpt.com/g/g-691241908c3881918a4bb238304d10fc-proyectia-por-el-profe-manuel'
+          ),
+      },
+      {
+        title: 'DocumentIA',
+        description: 'Actas, exhortos y documentos escolares.',
+        image: '/documentia.png',
+        action: () =>
+          openLink(
+            'https://chatgpt.com/g/g-69e3bdd04f8081919a1b6ba9af0c41de-documentia-por-el-profe-manuel'
           ),
       },
       {
@@ -217,15 +235,6 @@ function App() {
         action: () =>
           openLink(
             'https://drive.google.com/drive/folders/1eqaJUokhLa4AIuYXFncjPsS-lcVHEShs?usp=drive_link'
-          ),
-      },
-      {
-        title: 'DocumentIA',
-        description: 'Actas, exhortos y documentos escolares.',
-        image: '/documentia.png',
-        action: () =>
-          openLink(
-            'https://chatgpt.com/g/g-69e3bdd04f8081919a1b6ba9af0c41de-documentia-por-el-profe-manuel'
           ),
       },
     ],
@@ -277,6 +286,17 @@ function App() {
           🌐
         </a>
       </div>
+
+      <a
+        href="https://m.me/ElProfeManuell"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="messenger-bubble"
+        aria-label="Mandar mensaje por Facebook"
+      >
+        <span className="messenger-bubble-icon">✉</span>
+        <span className="messenger-bubble-text">Manda mensaje</span>
+      </a>
 
       <div className={`top-header ${getHeaderClass()} fade-up`}>
         {screen === 'home' ? (
@@ -386,7 +406,7 @@ function App() {
             >
               <img src="/documentia.png" alt="DocumentIA" className="card-image" />
               <h3>DocumentIA</h3>
-              <p>Exhortos, actas de hechos y administrativas.</p>
+              <p>Actas, exhortos y documentos escolares.</p>
             </div>
 
             <div
@@ -399,7 +419,7 @@ function App() {
             >
               <img src="/protocolia.png" alt="ProtocolIA" className="card-image" />
               <h3>ProtocolIA</h3>
-              <p>Protocolos escolares y rutas de actuación.</p>
+              <p>Protocolos escolares y rutas de atención.</p>
             </div>
 
             <div
@@ -416,7 +436,7 @@ function App() {
                 className="card-image"
               />
               <h3>Manual de Protocolos</h3>
-              <p>Consulta la ruta de actuación.</p>
+              <p>Consulta rápida y descarga.</p>
             </div>
 
             <div
@@ -429,7 +449,7 @@ function App() {
             >
               <img src="/pmcia.png" alt="PMCIA" className="card-image" />
               <h3>PMCIA</h3>
-              <p>Proceso de Mejora Continua con IA.</p>
+              <p>Proceso de Mejora Continua con inteligencia artificial.</p>
             </div>
 
             <div
@@ -457,7 +477,7 @@ function App() {
             >
               <img src="/programia.png" alt="ProgramIA" className="card-image" />
               <h3>ProgramIA</h3>
-              <p>Planeación del Programa Analítico</p>
+              <p>Planeación y programa analítico.</p>
             </div>
 
             <div
@@ -470,7 +490,33 @@ function App() {
             >
               <img src="/proyectia.png" alt="ProyectIA" className="card-image" />
               <h3>ProyectIA</h3>
-              <p>Planeación por Metodologìas de Proyectos.</p>
+              <p>Proyectos interdisciplinarios y STEAM.</p>
+            </div>
+
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() =>
+                openLink(
+                  'https://chatgpt.com/g/g-68d4988dac0c8191aab561ddce214c27-pmcia-por-el-profe-manuel'
+                )
+              }
+            >
+              <img src="/pmcia.png" alt="Ruta de Actividades" className="card-image" />
+              <h3>Ruta de Actividades</h3>
+              <p>GPT para organizar actividades y dar seguimiento al trabajo.</p>
+            </div>
+
+            <div
+              className={`card ${getCardClass()}`}
+              onClick={() =>
+                openLink(
+                  'https://chatgpt.com/g/g-69e3bdd04f8081919a1b6ba9af0c41de-documentia-por-el-profe-manuel'
+                )
+              }
+            >
+              <img src="/documentia.png" alt="DocumentIA" className="card-image" />
+              <h3>DocumentIA</h3>
+              <p>GPT para realizar solicitudes, acta de reunión, citatorios, exhortos, acta de hechos y más.</p>
             </div>
 
             <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
@@ -489,7 +535,7 @@ function App() {
             >
               <img src="/notebooklm.png" alt="NotebookLM" className="card-image" />
               <h3>NotebookLM</h3>
-              <p>Generador de Presentaciones, infografias y videos con IA.</p>
+              <p>Organización y análisis de documentos.</p>
             </div>
 
             <div
@@ -498,7 +544,7 @@ function App() {
             >
               <img src="/gamma.png" alt="Gamma" className="card-image" />
               <h3>Gamma</h3>
-              <p>Generador de presentaciones con IA.</p>
+              <p>Presentaciones con IA.</p>
             </div>
 
             <div
@@ -507,7 +553,7 @@ function App() {
             >
               <img src="/suno.png" alt="Suno" className="card-image" />
               <h3>Suno</h3>
-              <p>Generador de mùsica y canciones con IA</p>
+              <p>Música y canciones con IA.</p>
             </div>
           </div>
         )}
@@ -524,7 +570,7 @@ function App() {
             >
               <img src="/kahoot.png" alt="Kahoot" className="card-image" />
               <h3>Kahoot</h3>
-              <p>Quizzes que ponen a pruba el aprendizaje.</p>
+              <p>Materiales y recursos descargables.</p>
             </div>
 
             <div
@@ -541,7 +587,7 @@ function App() {
                 className="card-image"
               />
               <h3>Manual de Protocolos</h3>
-              <p>Consulta la ruta de actuaciòn sugerida.</p>
+              <p>Consulta rápida y descarga.</p>
             </div>
 
             <div
