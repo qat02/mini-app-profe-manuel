@@ -1,237 +1,43 @@
-.corre-profe-game {
-  text-align: center;
-  padding: 10px;
-  font-family: Arial, sans-serif;
-}
-
-.corre-profe-game h1 {
-  margin: 4px 0;
-  font-size: 22px;
-}
-
-.corre-profe-descripcion {
-  color: #555;
-  margin: 6px 0 10px;
-  font-size: 13px;
-}
-
-.corre-profe-marcador {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-  font-size: 13px;
-}
-
-.corre-profe-escenario {
-  position: relative;
-  width: 100%;
-  max-width: 620px;
-  height: 235px;
-  margin: auto;
-  border: 4px solid #333;
-  border-radius: 18px;
-  overflow: hidden;
-  background: linear-gradient(#dff3ff, #ffffff);
-  touch-action: manipulation;
-}
-
-.corre-profe-escenario::after {
-  content: "";
-  position: absolute;
-  bottom: 38px;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: #333;
-}
-
-.corre-profe-personaje {
-  position: absolute;
-  left: 45px;
-  bottom: 45px;
-  font-size: 38px;
-  z-index: 5;
-}
-
-.corre-profe-personaje.brincando {
-  animation: correProfeSalto 0.68s ease;
-}
-
-.corre-profe-personaje.agachado {
-  bottom: 36px;
-  font-size: 28px;
-}
-
-.corre-profe-obstaculo {
-  position: absolute;
-  left: 0;
-  font-size: 28px;
-  z-index: 6;
-  will-change: transform;
-}
-
-.corre-profe-obstaculo.bajo {
-  bottom: 46px;
-}
-
-.corre-profe-obstaculo.alto {
-  bottom: 62px;
-}
-
-.corre-profe-estrella {
-  position: absolute;
-  left: 0;
-  font-size: 24px;
-  z-index: 4;
-  will-change: transform;
-}
-
-.corre-profe-estrella.alta {
-  bottom: 125px;
-}
-
-.corre-profe-estrella.baja {
-  bottom: 82px;
-}
-
-.corre-profe-plus {
-  position: absolute;
-  font-weight: 900;
-  color: #0b7a1f;
-  font-size: 16px;
-  z-index: 8;
-  pointer-events: none;
-}
-
-@keyframes correProfeSalto {
-  0% { bottom: 45px; }
-  45% { bottom: 158px; }
-  60% { bottom: 158px; }
-  100% { bottom: 45px; }
-}
-
-.touch-zone {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  color: rgba(0, 0, 0, 0.14);
-  font-size: 10px;
-  font-weight: bold;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.touch-top {
-  top: 16px;
-}
-
-.touch-bottom {
-  bottom: 8px;
-}
-
-.corre-profe-controles {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.corre-profe-controles button,
-.corre-profe-game-over button {
-  padding: 11px 16px;
-  border: none;
-  border-radius: 14px;
-  background: #1e88e5;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.corre-profe-game-over {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.96);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  z-index: 20;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.corre-profe-game-over h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.puntaje-final {
-  font-size: 42px;
-  font-weight: 900;
+.game-over-profe {
+  font-size: 44px;
   line-height: 1;
 }
 
-.texto-puntaje {
-  margin: 0 0 4px 0;
+.game-over-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nuevo-record-box {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  margin: 4px 0 6px;
+}
+
+.nuevo-record-box p {
+  margin: 0;
   font-size: 12px;
-  color: #555;
-}
-
-.mensaje-derrota {
-  font-size: 14px;
-  font-weight: bold;
-  color: #b00020;
-  margin: 2px 0 5px 0;
-  max-width: 90%;
-}
-
-.resumen-bono {
-  font-size: 12px;
-  margin-bottom: 6px;
   font-weight: bold;
 }
 
-.resumen-bono p {
-  margin: 1px 0;
+.nuevo-record-box input {
+  width: 180px;
+  padding: 8px;
+  border: 2px solid #1e88e5;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
 }
 
 @media (max-width: 480px) {
-  .corre-profe-game {
-    padding: 8px;
-  }
-
-  .corre-profe-game h1 {
-    font-size: 20px;
-  }
-
-  .corre-profe-escenario {
-    height: 220px;
-  }
-
-  .corre-profe-personaje {
-    left: 32px;
-    font-size: 35px;
-  }
-
-  .corre-profe-obstaculo {
-    font-size: 26px;
-  }
-
-  .corre-profe-obstaculo.alto {
-    bottom: 60px;
-  }
-
-  .puntaje-final {
+  .game-over-profe {
     font-size: 36px;
   }
 
-  .corre-profe-controles button {
-    width: 46%;
-    font-size: 14px;
+  .nuevo-record-box input {
+    width: 160px;
   }
 }
