@@ -100,6 +100,11 @@ export default function CorreProfe() {
         { icono: "🔔", derrota: "Te venció la campana escolar." },
         { icono: "📢", derrota: "Te vencieron los avisos." },
       ],
+      superior: [
+        { icono: "☁️", derrota: "Te venció la carga administrativa." },
+        { icono: "📋", derrota: "Te venció el formato urgente." },
+        { icono: "📌", derrota: "Te venció el pendiente inesperado." },
+      ],
     },
     {
       bajo: [
@@ -111,6 +116,11 @@ export default function CorreProfe() {
         { icono: "🦜", derrota: "Te venció el pájaro distraído." },
         { icono: "🦇", derrota: "Te venció el murciélago escolar." },
         { icono: "🦅", derrota: "Te venció el ave del recreo." },
+      ],
+      superior: [
+        { icono: "🐦", derrota: "Te venció el pajarito escolar." },
+        { icono: "🕊️", derrota: "Te venció el ave tranquila." },
+        { icono: "🪶", derrota: "Te venció la pluma voladora." },
       ],
     },
     {
@@ -124,6 +134,11 @@ export default function CorreProfe() {
         { icono: "🪜", derrota: "Te venció la escalera." },
         { icono: "🧯", derrota: "Te venció el extintor." },
       ],
+      superior: [
+        { icono: "🖼️", derrota: "Te venció el cuadro del aula." },
+        { icono: "🧺", derrota: "Te venció la canasta colgante." },
+        { icono: "🪧", derrota: "Te venció el letrero urgente." },
+      ],
     },
     {
       bajo: [
@@ -135,6 +150,11 @@ export default function CorreProfe() {
         { icono: "🚦", derrota: "Te venció el semáforo escolar." },
         { icono: "🪧", derrota: "Te venció el letrero urgente." },
         { icono: "🚪", derrota: "Te venció la puerta inesperada." },
+      ],
+      superior: [
+        { icono: "☁️", derrota: "Te venció la nube administrativa." },
+        { icono: "🚁", derrota: "Te venció el helicóptero del recreo." },
+        { icono: "🛰️", derrota: "Te venció el satélite escolar." },
       ],
     },
     {
@@ -148,6 +168,11 @@ export default function CorreProfe() {
         { icono: "📋", derrota: "Te venció el formato urgente." },
         { icono: "📌", derrota: "Te venció el pendiente inesperado." },
       ],
+      superior: [
+        { icono: "📊", derrota: "Te vencieron las gráficas." },
+        { icono: "💼", derrota: "Te venció el maletín de pendientes." },
+        { icono: "🧠", derrota: "Te venció la sobrecarga mental." },
+      ],
     },
   ], []);
 
@@ -159,10 +184,46 @@ export default function CorreProfe() {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
-  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0) => {
+  const elegirItem = useCallback((nivel, grupoTipo) => {
     const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
-    const lista = catalogos[grupo][tipo];
-    const item = lista[Math.floor(Math.random() * lista.length)];
+    const lista = catalogos[grupo][grupoTipo];
+    return lista[Math.floor(Math.random() * lista.length)];
+  }, [catalogos]);
+
+  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0) => {
+    if (tipo === "doble-brinco") {
+      const bajo = elegirItem(nivel, "bajo");
+      const alto = elegirItem(nivel, "alto");
+
+      return {
+        id: idRef.current++,
+        tipo: "doble-brinco",
+        derrota: "Te venció el obstáculo doble. Había que brincar.",
+        x: 820 + xExtra,
+        partes: [
+          { linea: "bajo", icono: bajo.icono },
+          { linea: "medio", icono: alto.icono },
+        ],
+      };
+    }
+
+    if (tipo === "doble-agacharse") {
+      const alto = elegirItem(nivel, "alto");
+      const superior = elegirItem(nivel, "superior");
+
+      return {
+        id: idRef.current++,
+        tipo: "doble-agacharse",
+        derrota: "Te venció el obstáculo doble. Había que agacharse.",
+        x: 820 + xExtra,
+        partes: [
+          { linea: "medio", icono: alto.icono },
+          { linea: "superior", icono: superior.icono },
+        ],
+      };
+    }
+
+    const item = elegirItem(nivel, tipo);
 
     return {
       id: idRef.current++,
@@ -171,7 +232,7 @@ export default function CorreProfe() {
       derrota: item.derrota,
       x: 820 + xExtra,
     };
-  }, [catalogos]);
+  }, [elegirItem]);
 
   const crearEstrella = useCallback(() => ({
     id: idRef.current++,
@@ -290,12 +351,17 @@ export default function CorreProfe() {
         if (spawnRef.current >= intervalo) {
           spawnRef.current = 0;
 
-          const tipo1 = Math.random() > 0.5 ? "bajo" : "alto";
+          let tipo1 = Math.random() > 0.5 ? "bajo" : "alto";
+
+          if (nivel >= 5 && Math.random() < probabilidadDoble) {
+            tipo1 = Math.random() > 0.5 ? "doble-brinco" : "doble-agacharse";
+          }
+
           const nuevos = [crearObstaculo(tipo1, nivel)];
 
-          if (Math.random() < probabilidadDoble) {
+          if (nivel >= 6 && Math.random() < probabilidadDoble * 0.5) {
             const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
-            const separacionSegura = 570 + Math.random() * 190;
+            const separacionSegura = 620 + Math.random() * 210;
             nuevos.push(crearObstaculo(tipo2, nivel, separacionSegura));
           }
 
@@ -319,7 +385,9 @@ export default function CorreProfe() {
 
             if (
               (golpe.tipo === "bajo" && accionActual !== "brincando") ||
-              (golpe.tipo === "alto" && accionActual !== "agachado")
+              (golpe.tipo === "alto" && accionActual !== "agachado") ||
+              (golpe.tipo === "doble-brinco" && accionActual !== "brincando") ||
+              (golpe.tipo === "doble-agacharse" && accionActual !== "agachado")
             ) {
               terminarJuego(golpe.derrota);
             }
@@ -427,7 +495,18 @@ export default function CorreProfe() {
             className={`corre-profe-obstaculo ${o.tipo}`}
             style={{ transform: `translateX(${o.x}px)` }}
           >
-            {o.icono}
+            {o.partes ? (
+              o.partes.map((parte, index) => (
+                <span
+                  key={`${o.id}-${parte.linea}-${index}`}
+                  className={`obs-parte obs-${parte.linea}`}
+                >
+                  {parte.icono}
+                </span>
+              ))
+            ) : (
+              o.icono
+            )}
           </div>
         ))}
 
