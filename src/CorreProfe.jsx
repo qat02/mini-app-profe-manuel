@@ -460,7 +460,7 @@ export default function CorreProfe() {
           >
             +10 pts
           </div>
-        ))}>
+        ))}
 
         {gameOver && (
           <div className="corre-profe-game-over" onClick={(e) => e.stopPropagation()}>
