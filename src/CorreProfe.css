@@ -273,4 +273,36 @@
   width: 32px;
   height: 32px;
   object-fit: contain;
+}/* 🔥 OBSTÁCULOS DOBLES (CORREGIDO) */
+
+.corre-profe-obstaculo.doble-brinco,
+.corre-profe-obstaculo.doble-agacharse {
+  position: absolute;
+  width: 45px;
+  height: 110px;
+  bottom: 22px;
+}
+
+/* partes internas */
+.obs-parte {
+  position: absolute;
+  left: 0;
+  font-size: 34px; /* 🔥 controlamos tamaño */
+  width: 100%;
+  text-align: center;
+}
+
+/* BAJO (igual que original) */
+.obs-bajo {
+  bottom: 0;
+}
+
+/* MEDIO (igual que tu alto actual) */
+.obs-medio {
+  bottom: 50px;
+}
+
+/* SUPERIOR (ligeramente arriba, NO al techo) */
+.obs-superior {
+  bottom: 90px;
 }
