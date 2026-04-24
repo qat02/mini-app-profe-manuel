@@ -31,6 +31,7 @@ export default function CorreProfe() {
   const idRef = useRef(1);
   const mensajeDerrotaRef = useRef("");
 
+<<<<<<< HEAD
   const fondos = [
     "/fondo-1.png",
     "/fondo-2.png",
@@ -161,10 +162,131 @@ export default function CorreProfe() {
     accionRef.current = accion;
   }, [accion]);
 
+=======
+  const fondos = ["/fondo-1.png", "/fondo-2.png", "/fondo-3.png", "/fondo-4.png", "/fondo-5.png"];
+
+  const nivelActual = Math.floor(puntos / 200) + 1;
+  const fondoActual = fondos[Math.floor((nivelActual - 1) / 2) % fondos.length];
+
+  const playSound = useCallback((type) => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
+      const gainNode = audioCtx.createGain();
+      gainNode.connect(audioCtx.destination);
+
+      const tone = (freq, duration, delay = 0, volume = 0.07) => {
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = "square";
+        oscillator.frequency.value = freq;
+        oscillator.connect(gainNode);
+        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        oscillator.start(audioCtx.currentTime + delay);
+        oscillator.stop(audioCtx.currentTime + delay + duration);
+      };
+
+      if (type === "jump") tone(520, 0.12);
+      if (type === "duck") tone(260, 0.08);
+      if (type === "star") {
+        tone(780, 0.07);
+        tone(1040, 0.08, 0.07);
+      }
+      if (type === "lose") {
+        tone(220, 0.16, 0, 0.09);
+        tone(150, 0.25, 0.16, 0.09);
+      }
+      if (type === "restart") {
+        tone(440, 0.07);
+        tone(660, 0.07, 0.08);
+        tone(880, 0.09, 0.16);
+      }
+      if (type === "record") {
+        tone(660, 0.08);
+        tone(880, 0.08, 0.09);
+        tone(1100, 0.1, 0.18);
+        tone(1320, 0.13, 0.29);
+      }
+
+      setTimeout(() => audioCtx.close(), 800);
+    } catch {
+      console.log("Audio no disponible");
+    }
+  }, []);
+
+  const catalogos = useMemo(() => [
+    {
+      bajo: [
+        { icono: "📚", derrota: "Te vencieron las planeaciones." },
+        { icono: "📝", derrota: "Te vencieron los exámenes." },
+        { icono: "🎒", derrota: "Te venció la mochila abandonada." },
+      ],
+      alto: [
+        { icono: "📄", derrota: "Te vencieron los oficios urgentes." },
+        { icono: "🔔", derrota: "Te venció la campana escolar." },
+        { icono: "📢", derrota: "Te vencieron los avisos." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🐕", derrota: "Te venció el perro del patio." },
+        { icono: "🐈", derrota: "Te venció el gato escolar." },
+        { icono: "🐓", derrota: "Te venció el gallo madrugador." },
+      ],
+      alto: [
+        { icono: "🦜", derrota: "Te venció el pájaro distraído." },
+        { icono: "🦇", derrota: "Te venció el murciélago escolar." },
+        { icono: "🦅", derrota: "Te venció el ave del recreo." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🪑", derrota: "Te venció la silla atravesada." },
+        { icono: "📦", derrota: "Te venció la caja de material." },
+        { icono: "🪣", derrota: "Te venció la cubeta olvidada." },
+      ],
+      alto: [
+        { icono: "🧹", derrota: "Te venció la escoba voladora." },
+        { icono: "🪜", derrota: "Te venció la escalera." },
+        { icono: "🧯", derrota: "Te venció el extintor." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🚧", derrota: "Te venció la zona de construcción." },
+        { icono: "🕳️", derrota: "Te venció el hoyo del camino." },
+        { icono: "🌳", derrota: "Te venció el árbol del patio." },
+      ],
+      alto: [
+        { icono: "🚦", derrota: "Te venció el semáforo escolar." },
+        { icono: "🪧", derrota: "Te venció el letrero urgente." },
+        { icono: "🚪", derrota: "Te venció la puerta inesperada." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "👨‍💼", derrota: "Te venció el director." },
+        { icono: "👨‍👩‍👧", derrota: "Te vencieron los padres de familia." },
+        { icono: "🧑‍🏫", derrota: "Te venció el ATP." },
+      ],
+      alto: [
+        { icono: "☁️", derrota: "Te venció la carga administrativa." },
+        { icono: "📋", derrota: "Te venció el formato urgente." },
+        { icono: "📌", derrota: "Te venció el pendiente inesperado." },
+      ],
+    },
+  ], []);
+
+  useEffect(() => {
+    accionRef.current = accion;
+  }, [accion]);
+
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
   useEffect(() => {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
+<<<<<<< HEAD
   const crearObstaculo = useCallback(
     (tipo, nivel, xExtra = 0) => {
       const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
@@ -190,6 +312,27 @@ export default function CorreProfe() {
     }),
     []
   );
+=======
+  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0) => {
+    const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
+    const lista = catalogos[grupo][tipo];
+    const item = lista[Math.floor(Math.random() * lista.length)];
+
+    return {
+      id: idRef.current++,
+      tipo,
+      icono: item.icono,
+      derrota: item.derrota,
+      x: 820 + xExtra,
+    };
+  }, [catalogos]);
+
+  const crearEstrella = useCallback(() => ({
+    id: idRef.current++,
+    x: 820,
+    nivel: Math.random() > 0.5 ? "alta" : "baja",
+  }), []);
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
   const guardarNuevoRecord = (nombre) => {
     const limpio = nombre.trim() || "Profe anónimo";
@@ -203,6 +346,7 @@ export default function CorreProfe() {
     setNuevoRecord(false);
   };
 
+<<<<<<< HEAD
   const terminarJuego = useCallback(
     (mensaje) => {
       const totalFinal = Math.floor(scoreRef.current);
@@ -219,6 +363,21 @@ export default function CorreProfe() {
     },
     [playSound, record]
   );
+=======
+  const terminarJuego = useCallback((mensaje) => {
+    const totalFinal = Math.floor(scoreRef.current);
+
+    mensajeDerrotaRef.current = mensaje;
+    setPuntos(totalFinal);
+    playSound("lose");
+    setGameOver(true);
+
+    if (totalFinal > record) {
+      playSound("record");
+      setNuevoRecord(true);
+    }
+  }, [playSound, record]);
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
   const reiniciar = useCallback(() => {
     playSound("restart");
@@ -283,6 +442,7 @@ export default function CorreProfe() {
       if (!gameOverRef.current) {
         const nivel = Math.floor(scoreRef.current / 200) + 1;
 
+<<<<<<< HEAD
         // Velocidad más progresiva e infinita.
         const velocidad = 155 + nivel * 26;
 
@@ -291,6 +451,20 @@ export default function CorreProfe() {
 
         const probabilidadDoble =
           nivel < 6 ? 0 : Math.min((nivel - 5) * 0.01, 0.09);
+=======
+        const velocidad =
+          nivel <= 5
+            ? 160 + nivel * 30
+            : 310 + (nivel - 5) * 55;
+
+        const intervalo =
+          nivel <= 5
+            ? Math.max(2.2 - nivel * 0.05, 1.8)
+            : Math.max(1.8 - (nivel - 5) * 0.08, 1.1);
+
+        const probabilidadDoble =
+          nivel < 5 ? 0 : Math.min((nivel - 4) * 0.05, 0.35);
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
         scoreRef.current += dt * 7;
         setPuntos(Math.floor(scoreRef.current));
@@ -306,7 +480,11 @@ export default function CorreProfe() {
 
           if (Math.random() < probabilidadDoble) {
             const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
+<<<<<<< HEAD
             nuevos.push(crearObstaculo(tipo2, nivel, 600 + Math.random() * 220));
+=======
+            nuevos.push(crearObstaculo(tipo2, nivel, 650 + Math.random() * 180));
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
           }
 
           setObstaculos((prev) => [...prev, ...nuevos]);
@@ -322,7 +500,11 @@ export default function CorreProfe() {
             .map((o) => ({ ...o, x: o.x - velocidad * dt }))
             .filter((o) => o.x > -90);
 
+<<<<<<< HEAD
           const golpe = movidos.find((o) => o.x < 95 && o.x > 35);
+=======
+          const golpe = movidos.find((o) => o.x < 105 && o.x > 40);
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
           if (golpe) {
             const accionActual = accionRef.current;
@@ -343,7 +525,11 @@ export default function CorreProfe() {
 
           prev.forEach((s) => {
             const nuevaX = s.x - velocidad * dt;
+<<<<<<< HEAD
             const cerca = nuevaX < 95 && nuevaX > 35;
+=======
+            const cerca = nuevaX < 105 && nuevaX > 40;
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
             const puedeTomarla =
               (s.nivel === "alta" && accionRef.current === "brincando") ||
@@ -351,7 +537,10 @@ export default function CorreProfe() {
 
             if (cerca && puedeTomarla && !estrellasCobradasRef.current.has(s.id)) {
               estrellasCobradasRef.current.add(s.id);
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
               playSound("star");
 
               scoreRef.current += 10;
@@ -441,6 +630,7 @@ export default function CorreProfe() {
             {o.icono}
           </div>
         ))}
+<<<<<<< HEAD
 
         {estrellas.map((s) => (
           <div
@@ -461,9 +651,28 @@ export default function CorreProfe() {
             +10 pts
           </div>
         ))}
+=======
+>>>>>>> bb3769a (Agrego burbuja flotante del juego)
 
-        <div className="touch-zone touch-top">TOCA ARRIBA PARA BRINCAR</div>
-        <div className="touch-zone touch-bottom">TOCA ABAJO PARA AGACHARTE</div>
+        {estrellas.map((s) => (
+          <div
+            key={s.id}
+            className={`corre-profe-estrella ${s.nivel}`}
+            style={{ transform: `translateX(${s.x}px)` }}
+          >
+            ⭐
+          </div>
+        ))}
+
+        {plus.map((p) => (
+          <div
+            key={p.id}
+            className="corre-profe-plus"
+            style={{ left: `${p.x}px`, top: `${p.y}px` }}
+          >
+            +10 pts
+          </div>
+        ))}
 
         {gameOver && (
           <div className="corre-profe-game-over" onClick={(e) => e.stopPropagation()}>

@@ -34,6 +34,7 @@ function App() {
       '/kahoot.png',
       '/manual de protocolos.png',
       '/12temascte.png',
+      '/icono-juego.png',
     ];
 
     imagesToPreload.forEach((src) => {
@@ -152,7 +153,7 @@ function App() {
       {
         title: 'Corre Profe, Corre',
         description: 'Juego para sobrevivir a la carga administrativa y la jornada escolar.',
-        image: '/docentes.png',
+        image: '/icono-juego.png',
         action: () => setScreen('juego'),
       },
       {
@@ -302,6 +303,16 @@ function App() {
         </a>
       </div>
 
+      {screen !== 'juego' && (
+        <button
+          className="game-bubble"
+          onClick={() => setScreen('juego')}
+          aria-label="Abrir Corre Profe Corre"
+        >
+          <img src="/icono-juego.png" alt="Juego" />
+        </button>
+      )}
+
       <a
         href="https://m.me/ElProfeManuell"
         target="_blank"
@@ -398,9 +409,9 @@ function App() {
                 </div>
 
                 <div className="section-card green" onClick={() => setScreen('juego')}>
-                  <img src="/docentes.png" alt="Corre Profe Corre" className="section-card-image" />
+                  <img src="/icono-juego.png" alt="Corre Profe Corre" className="section-card-image" />
                   <div className="section-card-body">
-                    <h3>🎮 Corre Profe, Corre</h3>
+                    <h3>Corre Profe, Corre</h3>
                     <p>Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.</p>
                   </div>
                 </div>
@@ -540,12 +551,6 @@ function App() {
               <img src="/documentia.png" alt="DocumentIA" className="card-image" />
               <h3>DocumentIA</h3>
               <p>GPT para realizar solicitudes, acta de reunión, citatorios, exhortos, acta de hechos y más.</p>
-            </div>
-
-            <div className={`card ${getCardClass()}`} onClick={() => setScreen('juego')}>
-              <img src="/docentes.png" alt="Corre Profe Corre" className="card-image" />
-              <h3>🎮 Corre Profe, Corre</h3>
-              <p>Juego para sobrevivir a la carga administrativa y la jornada escolar.</p>
             </div>
 
             <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
