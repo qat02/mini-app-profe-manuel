@@ -26,6 +26,7 @@
   font-size: 12px;
 }
 
+/* ESCENARIO */
 .corre-profe-escenario {
   position: relative;
   width: 100%;
@@ -35,104 +36,108 @@
   border: 4px solid #333;
   border-radius: 18px;
   overflow: hidden;
-  background: linear-gradient(#dff3ff, #ffffff);
-  touch-action: manipulation;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
+/* CAPA SUAVE PARA QUE NO MOLESTE EL FONDO */
+.corre-profe-escenario::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.05);
+  z-index: 0;
+}
+
+/* PISO */
 .corre-profe-escenario::after {
   content: "";
   position: absolute;
-  bottom: 38px;
+  bottom: 30px;
   left: 0;
   width: 100%;
   height: 4px;
-  background: #333;
-}
-
-.corre-profe-personaje {
-  position: absolute;
-  left: 45px;
-  bottom: 45px;
-  font-size: 38px;
-  z-index: 5;
-}
-
-.corre-profe-personaje.brincando {
-  animation: correProfeSalto 0.7s ease;
-}
-
-.corre-profe-personaje.agachado {
-  bottom: 36px;
-  font-size: 28px;
-}
-
-.corre-profe-obstaculo {
-  position: absolute;
-  left: 0;
-  font-size: 27px;
-  z-index: 6;
-  will-change: transform;
-}
-
-.corre-profe-obstaculo.bajo {
-  bottom: 46px;
-}
-
-.corre-profe-obstaculo.alto {
-  bottom: 62px;
-}
-
-.corre-profe-estrella {
-  position: absolute;
-  left: 0;
-  font-size: 24px;
-  z-index: 4;
-  will-change: transform;
-}
-
-.corre-profe-estrella.alta {
-  bottom: 125px;
-}
-
-.corre-profe-estrella.baja {
-  bottom: 82px;
-}
-
-.corre-profe-plus {
-  position: absolute;
-  font-weight: 900;
-  color: #0b7a1f;
-  font-size: 15px;
-  z-index: 8;
-  pointer-events: none;
-}
-
-@keyframes correProfeSalto {
-  0% { bottom: 45px; }
-  45% { bottom: 158px; }
-  60% { bottom: 158px; }
-  100% { bottom: 45px; }
-}
-
-.touch-zone {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  color: rgba(0, 0, 0, 0.14);
-  font-size: 10px;
-  font-weight: bold;
-  pointer-events: none;
+  background: #222;
   z-index: 1;
 }
 
-.touch-top {
-  top: 16px;
+/* PERSONAJE */
+.corre-profe-personaje {
+  position: absolute;
+  left: 30px;
+  bottom: 30px;
+  z-index: 5;
 }
 
-.touch-bottom {
-  bottom: 8px;
+.corre-profe-personaje img {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
 }
 
+.corre-profe-personaje.brincando {
+  animation: salto 0.7s ease;
+}
+
+.corre-profe-personaje.agachado {
+  bottom: 25px;
+}
+
+.corre-profe-personaje.agachado img {
+  width: 90px;
+  height: 65px;
+}
+
+/* OBSTÁCULOS */
+.corre-profe-obstaculo {
+  position: absolute;
+  left: 0;
+  font-size: 38px;
+  z-index: 6;
+}
+
+.corre-profe-obstaculo.bajo {
+  bottom: 32px;
+}
+
+.corre-profe-obstaculo.alto {
+  bottom: 80px;
+}
+
+/* ESTRELLAS */
+.corre-profe-estrella {
+  position: absolute;
+  left: 0;
+  font-size: 30px;
+  z-index: 4;
+}
+
+.corre-profe-estrella.alta {
+  bottom: 150px;
+}
+
+.corre-profe-estrella.baja {
+  bottom: 90px;
+}
+
+/* TEXTO +10 */
+.corre-profe-plus {
+  position: absolute;
+  font-weight: bold;
+  color: green;
+  font-size: 16px;
+  z-index: 8;
+}
+
+/* SALTO */
+@keyframes salto {
+  0% { bottom: 30px; }
+  50% { bottom: 170px; }
+  100% { bottom: 30px; }
+}
+
+/* CONTROLES */
 .corre-profe-controles {
   margin-top: 10px;
   display: flex;
@@ -140,8 +145,7 @@
   gap: 10px;
 }
 
-.corre-profe-controles button,
-.corre-profe-game-over button {
+.corre-profe-controles button {
   padding: 10px 14px;
   border: none;
   border-radius: 14px;
@@ -149,125 +153,91 @@
   color: white;
   font-size: 13px;
   font-weight: bold;
-  cursor: pointer;
 }
 
+/* GAME OVER */
 .corre-profe-game-over {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255,255,255,0.93);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   z-index: 20;
   padding: 10px;
-  box-sizing: border-box;
 }
 
+/* IMAGEN GRANDE IZQUIERDA */
 .game-over-profe {
-  font-size: 32px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.game-over-texto {
+  width: 45%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 78%;
+  justify-content: center;
 }
 
-.corre-profe-game-over h2 {
-  margin: 0;
-  font-size: 15px;
+.game-over-profe img {
+  width: 200px;
+  height: auto;
+}
+
+/* TEXTO DERECHA */
+.game-over-texto {
+  width: 55%;
+  text-align: center;
 }
 
 .puntaje-final {
-  font-size: 32px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.texto-puntaje {
-  margin: 0 0 2px 0;
-  font-size: 11px;
-  color: #555;
+  font-size: 42px;
+  font-weight: bold;
 }
 
 .mensaje-derrota {
-  font-size: 12px;
+  color: red;
   font-weight: bold;
-  color: #b00020;
-  margin: 1px 0 3px 0;
-  max-width: 95%;
+  margin: 5px 0;
 }
 
-.resumen-bono {
-  font-size: 11px;
-  margin-bottom: 4px;
-  font-weight: bold;
-}
-
-.resumen-bono p {
-  margin: 1px 0;
-}
-
-.nuevo-record-box {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: center;
-  margin: 2px 0 4px;
-}
-
-.nuevo-record-box p {
-  margin: 0;
-  font-size: 11px;
-  font-weight: bold;
-}
-
+/* INPUT */
 .nuevo-record-box input {
-  width: 160px;
-  padding: 6px;
-  border: 2px solid #1e88e5;
+  padding: 8px;
   border-radius: 10px;
+  border: 2px solid #1e88e5;
   text-align: center;
+  margin-top: 5px;
+}
+
+.nuevo-record-box button {
+  margin-top: 5px;
+}
+
+/* BOTÓN FINAL */
+.corre-profe-game-over button {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: none;
+  background: #1e88e5;
+  color: white;
   font-weight: bold;
 }
 
+/* MOBILE */
 @media (max-width: 480px) {
-  .corre-profe-escenario {
-    height: 260px;
-  }
 
-  .corre-profe-personaje {
-    left: 32px;
-    font-size: 35px;
+  .corre-profe-personaje img {
+    width: 75px;
   }
 
   .corre-profe-obstaculo {
-    font-size: 26px;
+    font-size: 34px;
   }
 
-  .corre-profe-obstaculo.alto {
-    bottom: 60px;
+  .game-over-profe img {
+    width: 150px;
   }
 
   .puntaje-final {
-    font-size: 30px;
+    font-size: 34px;
   }
 
-  .game-over-profe {
-    font-size: 30px;
-  }
-
-  .nuevo-record-box input {
-    width: 145px;
-  }
-
-  .corre-profe-controles button {
-    width: 46%;
-    font-size: 13px;
-  }
 }
