@@ -22,7 +22,6 @@ export default function CorreProfe() {
   const accionRef = useRef("normal");
   const gameOverRef = useRef(false);
   const puntosRef = useRef(0);
-  const tiempoRef = useRef(0);
   const spawnRef = useRef(0);
   const starRef = useRef(0);
   const idRef = useRef(1);
@@ -40,22 +39,17 @@ export default function CorreProfe() {
         oscillator.type = "square";
         oscillator.frequency.value = freq;
         oscillator.connect(gainNode);
-
         gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
-        gainNode.gain.exponentialRampToValueAtTime(
-          0.001,
-          audioCtx.currentTime + delay + duration
-        );
-
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
         oscillator.start(audioCtx.currentTime + delay);
         oscillator.stop(audioCtx.currentTime + delay + duration);
       };
 
       if (type === "jump") tone(520, 0.12);
-      if (type === "duck") tone(260, 0.1);
+      if (type === "duck") tone(260, 0.08);
       if (type === "star") {
-        tone(780, 0.08);
-        tone(1040, 0.1, 0.08);
+        tone(780, 0.07);
+        tone(1040, 0.08, 0.07);
       }
       if (type === "lose") {
         tone(220, 0.16, 0, 0.09);
@@ -103,17 +97,18 @@ export default function CorreProfe() {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
+  const obtenerNivel = () => Math.min(10, Math.floor(puntosRef.current / 200) + 1);
+
   const crearObstaculo = useCallback(
     (tipo, xExtra = 0) => {
       const lista = catalogo[tipo];
       const item = lista[Math.floor(Math.random() * lista.length)];
-
       return {
         id: idRef.current++,
         tipo,
         icono: item.icono,
         derrota: item.derrota,
-        x: 740 + xExtra,
+        x: 760 + xExtra,
       };
     },
     [catalogo]
@@ -121,24 +116,23 @@ export default function CorreProfe() {
 
   const crearEstrella = () => ({
     id: idRef.current++,
-    x: 740,
+    x: 760,
     nivel: Math.random() > 0.5 ? "alta" : "baja",
   });
 
   const guardarNuevoRecord = (nombre) => {
     const limpio = nombre.trim() || "Profe anónimo";
-    localStorage.setItem("recordProfe", puntos);
+    const total = Math.floor(puntosRef.current);
+    localStorage.setItem("recordProfe", total);
     localStorage.setItem("recordProfeNombre", limpio);
-    setRecord(puntos);
+    setRecord(total);
     setNombreRecord(limpio);
     setNuevoRecord(false);
   };
 
   const reiniciar = useCallback(() => {
     playSound("restart");
-
     puntosRef.current = 0;
-    tiempoRef.current = 0;
     spawnRef.current = 0;
     starRef.current = 0;
     mensajeDerrotaRef.current = "";
@@ -161,7 +155,7 @@ export default function CorreProfe() {
 
     playSound("jump");
     setAccion("brincando");
-    setTimeout(() => setAccion("normal"), 720);
+    setTimeout(() => setAccion("normal"), 700);
   }, [reiniciar]);
 
   const agacharse = useCallback(() => {
@@ -170,7 +164,7 @@ export default function CorreProfe() {
 
     playSound("duck");
     setAccion("agachado");
-    setTimeout(() => setAccion("normal"), 620);
+    setTimeout(() => setAccion("normal"), 360);
   }, [reiniciar]);
 
   useEffect(() => {
@@ -192,17 +186,10 @@ export default function CorreProfe() {
       last = now;
 
       if (!gameOverRef.current) {
-        tiempoRef.current += dt;
-
-        // La dificultad sube principalmente por velocidad, no por obstáculos amontonados.
-        const velocidad = Math.min(145 + tiempoRef.current * 7.8, 430);
-
-        // Obstáculos más separados para que se pueda avanzar.
-        const intervalo = Math.max(2.1 - tiempoRef.current * 0.006, 1.35);
-
-        // Dobles solo después de un rato y con poca probabilidad.
-        const probabilidadDoble =
-          tiempoRef.current < 35 ? 0 : Math.min((tiempoRef.current - 35) / 180, 0.18);
+        const nivel = obtenerNivel();
+        const velocidad = 145 + nivel * 32;
+        const intervalo = Math.max(2.05 - nivel * 0.06, 1.4);
+        const probabilidadDoble = nivel < 4 ? 0 : Math.min((nivel - 3) * 0.035, 0.22);
 
         puntosRef.current += dt * 7;
         setPuntos(Math.floor(puntosRef.current));
@@ -218,13 +205,13 @@ export default function CorreProfe() {
 
           if (Math.random() < probabilidadDoble) {
             const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
-            nuevos.push(crearObstaculo(tipo2, 300 + Math.random() * 120));
+            nuevos.push(crearObstaculo(tipo2, 330 + Math.random() * 140));
           }
 
           setObstaculos((prev) => [...prev, ...nuevos]);
         }
 
-        if (starRef.current >= 5.6 + Math.random() * 2.6) {
+        if (starRef.current >= 5.6 + Math.random() * 2.4) {
           starRef.current = 0;
           setEstrellas((prev) => [...prev, crearEstrella()]);
         }
@@ -239,18 +226,10 @@ export default function CorreProfe() {
           if (golpe) {
             const accionActual = accionRef.current;
 
-            if (golpe.tipo === "bajo" && accionActual !== "brincando") {
-              mensajeDerrotaRef.current = golpe.derrota;
-              playSound("lose");
-              setGameOver(true);
-
-              if (Math.floor(puntosRef.current) > record) {
-                playSound("record");
-                setNuevoRecord(true);
-              }
-            }
-
-            if (golpe.tipo === "alto" && accionActual !== "agachado") {
+            if (
+              (golpe.tipo === "bajo" && accionActual !== "brincando") ||
+              (golpe.tipo === "alto" && accionActual !== "agachado")
+            ) {
               mensajeDerrotaRef.current = golpe.derrota;
               playSound("lose");
               setGameOver(true);
@@ -278,10 +257,10 @@ export default function CorreProfe() {
 
             if (cerca && puedeTomarla) {
               playSound("star");
-              puntosRef.current += 50;
+              puntosRef.current += 10;
               setPuntos(Math.floor(puntosRef.current));
               setEstrellasTomadas((v) => v + 1);
-              setBonoTotal((v) => v + 50);
+              setBonoTotal((v) => v + 10);
 
               setPlus((prevPlus) => [
                 ...prevPlus,
@@ -299,11 +278,7 @@ export default function CorreProfe() {
           return restantes;
         });
 
-        setPlus((prev) =>
-          prev
-            .map((p) => ({ ...p, y: p.y - 1.5 }))
-            .filter((p) => p.y > 25)
-        );
+        setPlus((prev) => prev.map((p) => ({ ...p, y: p.y - 1.5 })).filter((p) => p.y > 25));
       }
 
       raf = requestAnimationFrame(loop);
@@ -331,6 +306,7 @@ export default function CorreProfe() {
 
       <div className="corre-profe-marcador">
         <span>Puntos: {puntos}</span>
+        <span>Nivel: {Math.min(10, Math.floor(puntos / 200) + 1)}</span>
         <span>🏆 Récord: {record}</span>
         <span>👤 {nombreRecord}</span>
         <span>⭐ {estrellasTomadas}</span>
@@ -367,7 +343,7 @@ export default function CorreProfe() {
             className="corre-profe-plus"
             style={{ left: `${p.x}px`, top: `${p.y}px` }}
           >
-            +50 pts
+            +10 pts
           </div>
         ))}
 
@@ -375,13 +351,11 @@ export default function CorreProfe() {
         <div className="touch-zone touch-bottom">TOCA ABAJO PARA AGACHARTE</div>
 
         {gameOver && (
-          <div className="corre-profe-game-over">
-            <div className="game-over-profe">
-              {nuevoRecord ? "🎉👨‍🏫" : "🤕👨‍🏫"}
-            </div>
+          <div className="corre-profe-game-over" onClick={(e) => e.stopPropagation()}>
+            <div className="game-over-profe">{nuevoRecord ? "🎉👨‍🏫" : "🤕👨‍🏫"}</div>
 
             <div className="game-over-texto">
-              <h2>{nuevoRecord ? "¡Nuevo récord!" : "😵 Fin de la jornada"}</h2>
+              <h2>{nuevoRecord ? "¡Nuevo récord!" : "Fin de la jornada"}</h2>
               <div className="puntaje-final">{puntos}</div>
               <p className="texto-puntaje">puntos totales</p>
               <p className="mensaje-derrota">{mensajeDerrotaRef.current}</p>
@@ -393,21 +367,19 @@ export default function CorreProfe() {
 
               {nuevoRecord && (
                 <div className="nuevo-record-box">
-                  <p>Escribe tu nombre para guardar el récord:</p>
+                  <p>Escribe tu nombre:</p>
                   <input
                     value={nombreJugador}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => setNombreJugador(e.target.value)}
                     placeholder="Tu nombre"
                     maxLength="18"
                   />
-                  <button onClick={() => guardarNuevoRecord(nombreJugador)}>
-                    Guardar récord
-                  </button>
+                  <button onClick={() => guardarNuevoRecord(nombreJugador)}>Guardar récord</button>
                 </div>
               )}
 
-              {!nuevoRecord && <button onClick={reiniciar}>Reiniciar</button>}
-              {nuevoRecord && <button onClick={reiniciar}>Jugar otra vez</button>}
+              <button onClick={reiniciar}>{nuevoRecord ? "Jugar otra vez" : "Reiniciar"}</button>
             </div>
           </div>
         )}
