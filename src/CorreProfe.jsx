@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./CorreProfe.css";
 
+const RANKING_URL = "https://docs.google.com/spreadsheets/d/1NTe4pZ0pSn5qNa7adKiWgzbLoBGbOEitANGoiisicgE/edit?usp=drive_link";
+
 export default function CorreProfe() {
   const recordGuardado = Number(localStorage.getItem("recordProfe")) || 0;
   const nombreGuardado = localStorage.getItem("recordProfeNombre") || "Sin nombre";
@@ -31,16 +33,14 @@ export default function CorreProfe() {
   const idRef = useRef(1);
   const mensajeDerrotaRef = useRef("");
 
-  const fondos = [
-    "/fondo-1.png",
-    "/fondo-2.png",
-    "/fondo-3.png",
-    "/fondo-4.png",
-    "/fondo-5.png",
-  ];
+  const fondos = ["/fondo-1.png", "/fondo-2.png", "/fondo-3.png", "/fondo-4.png", "/fondo-5.png"];
 
   const nivelActual = Math.floor(puntos / 200) + 1;
   const fondoActual = fondos[Math.floor((nivelActual - 1) / 2) % fondos.length];
+
+  const abrirRanking = () => {
+    window.open(RANKING_URL, "_blank", "noopener,noreferrer");
+  };
 
   const playSound = useCallback((type) => {
     try {
@@ -55,10 +55,7 @@ export default function CorreProfe() {
         oscillator.frequency.value = freq;
         oscillator.connect(gainNode);
         gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
-        gainNode.gain.exponentialRampToValueAtTime(
-          0.001,
-          audioCtx.currentTime + delay + duration
-        );
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
         oscillator.start(audioCtx.currentTime + delay);
         oscillator.stop(audioCtx.currentTime + delay + duration);
       };
@@ -91,71 +88,68 @@ export default function CorreProfe() {
     }
   }, []);
 
-  const catalogos = useMemo(
-    () => [
-      {
-        bajo: [
-          { icono: "📚", derrota: "Te vencieron las planeaciones." },
-          { icono: "📝", derrota: "Te vencieron los exámenes." },
-          { icono: "🎒", derrota: "Te venció la mochila abandonada." },
-        ],
-        alto: [
-          { icono: "📄", derrota: "Te vencieron los oficios urgentes." },
-          { icono: "🔔", derrota: "Te venció la campana escolar." },
-          { icono: "📢", derrota: "Te vencieron los avisos de último momento." },
-        ],
-      },
-      {
-        bajo: [
-          { icono: "🐕", derrota: "Te venció el perro del patio." },
-          { icono: "🐈", derrota: "Te venció el gato escolar." },
-          { icono: "🐓", derrota: "Te venció el gallo madrugador." },
-        ],
-        alto: [
-          { icono: "🦜", derrota: "Te venció el pájaro distraído." },
-          { icono: "🦇", derrota: "Te venció el murciélago escolar." },
-          { icono: "🦅", derrota: "Te venció el ave del recreo." },
-        ],
-      },
-      {
-        bajo: [
-          { icono: "🪑", derrota: "Te venció la silla atravesada." },
-          { icono: "📦", derrota: "Te venció la caja de material." },
-          { icono: "🪣", derrota: "Te venció la cubeta olvidada." },
-        ],
-        alto: [
-          { icono: "🧹", derrota: "Te venció la escoba voladora." },
-          { icono: "🪜", derrota: "Te venció la escalera del mantenimiento." },
-          { icono: "🧯", derrota: "Te venció el extintor escolar." },
-        ],
-      },
-      {
-        bajo: [
-          { icono: "🚧", derrota: "Te venció la zona de construcción." },
-          { icono: "🕳️", derrota: "Te venció el hoyo del camino." },
-          { icono: "🌳", derrota: "Te venció el árbol del patio." },
-        ],
-        alto: [
-          { icono: "🚦", derrota: "Te venció el semáforo escolar." },
-          { icono: "🪧", derrota: "Te venció el letrero de reunión urgente." },
-          { icono: "🚪", derrota: "Te venció la puerta inesperada." },
-        ],
-      },
-      {
-        bajo: [
-          { icono: "👨‍💼", derrota: "Te venció el director." },
-          { icono: "👨‍👩‍👧", derrota: "Te vencieron los padres de familia." },
-          { icono: "🧑‍🏫", derrota: "Te venció el ATP." },
-        ],
-        alto: [
-          { icono: "☁️", derrota: "Te venció la carga administrativa." },
-          { icono: "📋", derrota: "Te venció el formato urgente." },
-          { icono: "📌", derrota: "Te venció el pendiente inesperado." },
-        ],
-      },
-    ],
-    []
-  );
+  const catalogos = useMemo(() => [
+    {
+      bajo: [
+        { icono: "📚", derrota: "Te vencieron las planeaciones." },
+        { icono: "📝", derrota: "Te vencieron los exámenes." },
+        { icono: "🎒", derrota: "Te venció la mochila abandonada." },
+      ],
+      alto: [
+        { icono: "📄", derrota: "Te vencieron los oficios urgentes." },
+        { icono: "🔔", derrota: "Te venció la campana escolar." },
+        { icono: "📢", derrota: "Te vencieron los avisos." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🐕", derrota: "Te venció el perro del patio." },
+        { icono: "🐈", derrota: "Te venció el gato escolar." },
+        { icono: "🐓", derrota: "Te venció el gallo madrugador." },
+      ],
+      alto: [
+        { icono: "🦜", derrota: "Te venció el pájaro distraído." },
+        { icono: "🦇", derrota: "Te venció el murciélago escolar." },
+        { icono: "🦅", derrota: "Te venció el ave del recreo." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🪑", derrota: "Te venció la silla atravesada." },
+        { icono: "📦", derrota: "Te venció la caja de material." },
+        { icono: "🪣", derrota: "Te venció la cubeta olvidada." },
+      ],
+      alto: [
+        { icono: "🧹", derrota: "Te venció la escoba voladora." },
+        { icono: "🪜", derrota: "Te venció la escalera." },
+        { icono: "🧯", derrota: "Te venció el extintor." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "🚧", derrota: "Te venció la zona de construcción." },
+        { icono: "🕳️", derrota: "Te venció el hoyo del camino." },
+        { icono: "🌳", derrota: "Te venció el árbol del patio." },
+      ],
+      alto: [
+        { icono: "🚦", derrota: "Te venció el semáforo escolar." },
+        { icono: "🪧", derrota: "Te venció el letrero urgente." },
+        { icono: "🚪", derrota: "Te venció la puerta inesperada." },
+      ],
+    },
+    {
+      bajo: [
+        { icono: "👨‍💼", derrota: "Te venció el director." },
+        { icono: "👨‍👩‍👧", derrota: "Te vencieron los padres de familia." },
+        { icono: "🧑‍🏫", derrota: "Te venció el ATP." },
+      ],
+      alto: [
+        { icono: "☁️", derrota: "Te venció la carga administrativa." },
+        { icono: "📋", derrota: "Te venció el formato urgente." },
+        { icono: "📌", derrota: "Te venció el pendiente inesperado." },
+      ],
+    },
+  ], []);
 
   useEffect(() => {
     accionRef.current = accion;
@@ -165,31 +159,25 @@ export default function CorreProfe() {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
-  const crearObstaculo = useCallback(
-    (tipo, nivel, xExtra = 0) => {
-      const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
-      const lista = catalogos[grupo][tipo];
-      const item = lista[Math.floor(Math.random() * lista.length)];
+  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0) => {
+    const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
+    const lista = catalogos[grupo][tipo];
+    const item = lista[Math.floor(Math.random() * lista.length)];
 
-      return {
-        id: idRef.current++,
-        tipo,
-        icono: item.icono,
-        derrota: item.derrota,
-        x: 820 + xExtra,
-      };
-    },
-    [catalogos]
-  );
-
-  const crearEstrella = useCallback(
-    () => ({
+    return {
       id: idRef.current++,
-      x: 820,
-      nivel: Math.random() > 0.5 ? "alta" : "baja",
-    }),
-    []
-  );
+      tipo,
+      icono: item.icono,
+      derrota: item.derrota,
+      x: 820 + xExtra,
+    };
+  }, [catalogos]);
+
+  const crearEstrella = useCallback(() => ({
+    id: idRef.current++,
+    x: 820,
+    nivel: Math.random() > 0.5 ? "alta" : "baja",
+  }), []);
 
   const guardarNuevoRecord = (nombre) => {
     const limpio = nombre.trim() || "Profe anónimo";
@@ -203,22 +191,19 @@ export default function CorreProfe() {
     setNuevoRecord(false);
   };
 
-  const terminarJuego = useCallback(
-    (mensaje) => {
-      const totalFinal = Math.floor(scoreRef.current);
+  const terminarJuego = useCallback((mensaje) => {
+    const totalFinal = Math.floor(scoreRef.current);
 
-      mensajeDerrotaRef.current = mensaje;
-      setPuntos(totalFinal);
-      playSound("lose");
-      setGameOver(true);
+    mensajeDerrotaRef.current = mensaje;
+    setPuntos(totalFinal);
+    playSound("lose");
+    setGameOver(true);
 
-      if (totalFinal > record) {
-        playSound("record");
-        setNuevoRecord(true);
-      }
-    },
-    [playSound, record]
-  );
+    if (totalFinal > record) {
+      playSound("record");
+      setNuevoRecord(true);
+    }
+  }, [playSound, record]);
 
   const reiniciar = useCallback(() => {
     playSound("restart");
@@ -283,14 +268,18 @@ export default function CorreProfe() {
       if (!gameOverRef.current) {
         const nivel = Math.floor(scoreRef.current / 200) + 1;
 
-        // Velocidad más progresiva e infinita.
-        const velocidad = 155 + nivel * 26;
+        const velocidad =
+          nivel <= 5
+            ? 160 + nivel * 30
+            : 360 + (nivel - 5) * 75;
 
-        // Separación estable para que la dificultad no sea por amontonamiento.
-        const intervalo = Math.max(2.25 - nivel * 0.015, 1.65);
+        const intervalo =
+          nivel <= 5
+            ? Math.max(2.2 - nivel * 0.05, 1.8)
+            : Math.max(1.75 - (nivel - 5) * 0.075, 1.05);
 
         const probabilidadDoble =
-          nivel < 6 ? 0 : Math.min((nivel - 5) * 0.01, 0.09);
+          nivel < 5 ? 0 : Math.min(0.18 + (nivel - 5) * 0.035, 0.36);
 
         scoreRef.current += dt * 7;
         setPuntos(Math.floor(scoreRef.current));
@@ -306,7 +295,8 @@ export default function CorreProfe() {
 
           if (Math.random() < probabilidadDoble) {
             const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
-            nuevos.push(crearObstaculo(tipo2, nivel, 600 + Math.random() * 220));
+            const separacionSegura = 570 + Math.random() * 190;
+            nuevos.push(crearObstaculo(tipo2, nivel, separacionSegura));
           }
 
           setObstaculos((prev) => [...prev, ...nuevos]);
@@ -322,7 +312,7 @@ export default function CorreProfe() {
             .map((o) => ({ ...o, x: o.x - velocidad * dt }))
             .filter((o) => o.x > -90);
 
-          const golpe = movidos.find((o) => o.x < 95 && o.x > 35);
+          const golpe = movidos.find((o) => o.x < 105 && o.x > 40);
 
           if (golpe) {
             const accionActual = accionRef.current;
@@ -343,7 +333,7 @@ export default function CorreProfe() {
 
           prev.forEach((s) => {
             const nuevaX = s.x - velocidad * dt;
-            const cerca = nuevaX < 95 && nuevaX > 35;
+            const cerca = nuevaX < 105 && nuevaX > 40;
 
             const puedeTomarla =
               (s.nivel === "alta" && accionRef.current === "brincando") ||
@@ -351,7 +341,6 @@ export default function CorreProfe() {
 
             if (cerca && puedeTomarla && !estrellasCobradasRef.current.has(s.id)) {
               estrellasCobradasRef.current.add(s.id);
-
               playSound("star");
 
               scoreRef.current += 10;
@@ -497,6 +486,8 @@ export default function CorreProfe() {
                   </button>
                 </div>
               )}
+
+              <button onClick={abrirRanking}>🏆 Ver ranking</button>
 
               <button onClick={reiniciar}>
                 {nuevoRecord ? "Jugar otra vez" : "Reiniciar"}
