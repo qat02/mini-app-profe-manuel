@@ -6,23 +6,26 @@ export default function CorreProfe() {
   const [puntos, setPuntos] = useState(0);
   const [record, setRecord] = useState(Number(localStorage.getItem("recordProfe")) || 0);
   const [gameOver, setGameOver] = useState(false);
-  const [velocidad, setVelocidad] = useState(2200);
+  const [velocidad, setVelocidad] = useState(2600);
   const [obstaculo, setObstaculo] = useState({
     icono: "📚",
     tipo: "bajo",
-    frase: "¡Brincaste las planeaciones!",
+    derrota: "Te vencieron las planeaciones.",
   });
 
-  const fraseRef = useRef("");
+  const personajeRef = useRef(null);
+  const obstaculoRef = useRef(null);
+  const animacionRef = useRef(null);
+  const mensajeDerrotaRef = useRef("");
 
   const obstaculos = useMemo(
     () => [
-      { icono: "📚", tipo: "bajo", frase: "¡Brincaste las planeaciones!" },
-      { icono: "📝", tipo: "bajo", frase: "¡Superaste los exámenes!" },
-      { icono: "👨‍💼", tipo: "bajo", frase: "¡Sobreviviste al director!" },
-      { icono: "👨‍👩‍👧", tipo: "alto", frase: "¡Recibiste al padre de familia!" },
-      { icono: "🧑‍🏫", tipo: "alto", frase: "¡Superaste al ATP!" },
-      { icono: "📄", tipo: "alto", frase: "¡Esquivaste los oficios!" },
+      { icono: "📚", tipo: "bajo", derrota: "Te vencieron las planeaciones." },
+      { icono: "📝", tipo: "bajo", derrota: "Te vencieron los exámenes sin revisar." },
+      { icono: "👨‍💼", tipo: "bajo", derrota: "Te venció el director." },
+      { icono: "👨‍👩‍👧", tipo: "alto", derrota: "Te vencieron los padres de familia." },
+      { icono: "🧑‍🏫", tipo: "alto", derrota: "Te venció el ATP." },
+      { icono: "📄", tipo: "alto", derrota: "Te vencieron los oficios urgentes." },
     ],
     []
   );
@@ -32,7 +35,7 @@ export default function CorreProfe() {
     if (accion !== "normal") return;
 
     setAccion("brincando");
-    setTimeout(() => setAccion("normal"), 550);
+    setTimeout(() => setAccion("normal"), 650);
   };
 
   const agacharse = () => {
@@ -40,14 +43,21 @@ export default function CorreProfe() {
     if (accion !== "normal") return;
 
     setAccion("agachado");
-    setTimeout(() => setAccion("normal"), 550);
+    setTimeout(() => setAccion("normal"), 500);
   };
 
   const reiniciar = () => {
     setPuntos(0);
-    setVelocidad(2200);
+    setVelocidad(2600);
     setGameOver(false);
     setAccion("normal");
+    mensajeDerrotaRef.current = "";
+  };
+
+  const cambiarObstaculo = () => {
+    const nuevo = obstaculos[Math.floor(Math.random() * obstaculos.length)];
+    setObstaculo(nuevo);
+    mensajeDerrotaRef.current = nuevo.derrota;
   };
 
   useEffect(() => {
@@ -65,7 +75,7 @@ export default function CorreProfe() {
 
     const puntosInterval = setInterval(() => {
       setPuntos((p) => p + 1);
-    }, 300);
+    }, 250);
 
     return () => clearInterval(puntosInterval);
   }, [gameOver]);
@@ -76,30 +86,57 @@ export default function CorreProfe() {
       localStorage.setItem("recordProfe", puntos);
     }
 
-    if (puntos > 0 && puntos % 25 === 0) {
-      setVelocidad((v) => Math.max(900, v - 100));
+    if (puntos > 0 && puntos % 35 === 0) {
+      setVelocidad((v) => Math.max(1300, v - 120));
     }
   }, [puntos, record]);
 
   useEffect(() => {
     if (gameOver) return;
 
-    const cambio = setInterval(() => {
-      const nuevo = obstaculos[Math.floor(Math.random() * obstaculos.length)];
-      setObstaculo(nuevo);
-      fraseRef.current = nuevo.frase;
-    }, velocidad);
+    const revisarColision = () => {
+      const personaje = personajeRef.current;
+      const obstaculoActual = obstaculoRef.current;
 
-    return () => clearInterval(cambio);
-  }, [velocidad, gameOver, obstaculos]);
+      if (!personaje || !obstaculoActual) {
+        animacionRef.current = requestAnimationFrame(revisarColision);
+        return;
+      }
 
-  const revisarChoque = () => {
-    if (obstaculo.tipo === "bajo" && accion !== "brincando") {
-      setGameOver(true);
-    }
+      const p = personaje.getBoundingClientRect();
+      const o = obstaculoActual.getBoundingClientRect();
 
-    if (obstaculo.tipo === "alto" && accion !== "agachado") {
-      setGameOver(true);
+      // Margen de perdón: hace que la colisión no sea tan estricta.
+      const margenHorizontal = 18;
+      const margenVertical = 14;
+
+      const chocan =
+        p.right - margenHorizontal > o.left + margenHorizontal &&
+        p.left + margenHorizontal < o.right - margenHorizontal &&
+        p.bottom - margenVertical > o.top + margenVertical &&
+        p.top + margenVertical < o.bottom - margenVertical;
+
+      if (chocan) {
+        setGameOver(true);
+        return;
+      }
+
+      animacionRef.current = requestAnimationFrame(revisarColision);
+    };
+
+    animacionRef.current = requestAnimationFrame(revisarColision);
+
+    return () => cancelAnimationFrame(animacionRef.current);
+  }, [gameOver, obstaculo]);
+
+  const tocarPantalla = (e) => {
+    const mitad = window.innerHeight / 2;
+    const y = e.clientY || e.touches?.[0]?.clientY;
+
+    if (y < mitad) {
+      brincar();
+    } else {
+      agacharse();
     }
   };
 
@@ -116,25 +153,32 @@ export default function CorreProfe() {
         <span>Mejor jornada docente: {record}</span>
       </div>
 
-      <div className="corre-profe-escenario">
-        <div className={`corre-profe-personaje ${accion}`}>
+      <div className="corre-profe-escenario" onClick={tocarPantalla}>
+        <div ref={personajeRef} className={`corre-profe-personaje ${accion}`}>
           {accion === "agachado" ? "🙇‍♂️" : "👨‍🏫"}
         </div>
 
         {!gameOver && (
           <div
+            key={`${obstaculo.icono}-${velocidad}`}
+            ref={obstaculoRef}
             className={`corre-profe-obstaculo ${obstaculo.tipo}`}
             style={{ animationDuration: `${velocidad}ms` }}
-            onAnimationIteration={revisarChoque}
+            onAnimationIteration={cambiarObstaculo}
           >
             {obstaculo.icono}
           </div>
         )}
 
+        <div className="touch-zone touch-top">TOCA ARRIBA PARA BRINCAR</div>
+        <div className="touch-zone touch-bottom">TOCA ABAJO PARA AGACHARTE</div>
+
         {gameOver && (
           <div className="corre-profe-game-over">
             <h2>😵 Fin de la jornada</h2>
-            <p>{fraseRef.current}</p>
+            <div className="puntaje-final">{puntos}</div>
+            <p className="texto-puntaje">puntos logrados</p>
+            <p className="mensaje-derrota">{mensajeDerrotaRef.current}</p>
             <button onClick={reiniciar}>Reiniciar</button>
           </div>
         )}

@@ -1,43 +1,47 @@
 .corre-profe-game {
   text-align: center;
-  padding: 20px;
+  padding: 16px;
   font-family: Arial, sans-serif;
 }
 
 .corre-profe-game h1 {
   margin-bottom: 5px;
+  font-size: 24px;
 }
 
 .corre-profe-descripcion {
   color: #555;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
 .corre-profe-marcador {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 14px;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
+  font-size: 14px;
 }
 
 .corre-profe-escenario {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  height: 230px;
+  max-width: 620px;
+  height: 245px;
   margin: auto;
   border: 4px solid #333;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(#dff3ff, #ffffff);
+  touch-action: manipulation;
 }
 
 .corre-profe-escenario::after {
   content: "";
   position: absolute;
-  bottom: 35px;
+  bottom: 38px;
   left: 0;
   width: 100%;
   height: 4px;
@@ -47,51 +51,71 @@
 .corre-profe-personaje {
   position: absolute;
   left: 45px;
-  bottom: 42px;
-  font-size: 48px;
-  z-index: 2;
+  bottom: 45px;
+  font-size: 38px;
+  z-index: 3;
 }
 
 .corre-profe-personaje.brincando {
-  animation: correProfeSalto 0.55s ease;
+  animation: correProfeSalto 0.65s ease;
 }
 
 .corre-profe-personaje.agachado {
-  bottom: 35px;
-  font-size: 38px;
+  bottom: 38px;
+  font-size: 30px;
 }
 
 .corre-profe-obstaculo {
   position: absolute;
-  right: -60px;
-  font-size: 44px;
-  z-index: 2;
+  right: -50px;
+  font-size: 32px;
+  z-index: 3;
   animation-name: correProfeMover;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
 
 .corre-profe-obstaculo.bajo {
-  bottom: 42px;
+  bottom: 45px;
 }
 
 .corre-profe-obstaculo.alto {
-  bottom: 105px;
+  bottom: 82px;
 }
 
 @keyframes correProfeSalto {
-  0% { bottom: 42px; }
-  50% { bottom: 125px; }
-  100% { bottom: 42px; }
+  0% { bottom: 45px; }
+  45% { bottom: 150px; }
+  60% { bottom: 150px; }
+  100% { bottom: 45px; }
 }
 
 @keyframes correProfeMover {
-  from { right: -60px; }
-  to { right: 100%; }
+  from { right: -50px; }
+  to { right: 105%; }
+}
+
+.touch-zone {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  color: rgba(0, 0, 0, 0.18);
+  font-size: 11px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.touch-top {
+  top: 18px;
+}
+
+.touch-bottom {
+  bottom: 8px;
 }
 
 .corre-profe-controles {
-  margin-top: 18px;
+  margin-top: 16px;
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -99,9 +123,9 @@
 
 .corre-profe-controles button,
 .corre-profe-game-over button {
-  padding: 12px 18px;
+  padding: 13px 20px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #1e88e5;
   color: white;
   font-size: 16px;
@@ -112,10 +136,56 @@
 .corre-profe-game-over {
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.94);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 5;
+  gap: 4px;
+  z-index: 10;
+}
+
+.corre-profe-game-over h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.puntaje-final {
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+  color: #111;
+}
+
+.texto-puntaje {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.mensaje-derrota {
+  font-size: 17px;
+  font-weight: bold;
+  color: #b00020;
+  margin: 4px 0 12px 0;
+}
+
+@media (max-width: 480px) {
+  .corre-profe-escenario {
+    height: 230px;
+  }
+
+  .corre-profe-personaje {
+    left: 32px;
+    font-size: 36px;
+  }
+
+  .corre-profe-obstaculo {
+    font-size: 30px;
+  }
+
+  .corre-profe-controles button {
+    width: 46%;
+    font-size: 15px;
+  }
 }
