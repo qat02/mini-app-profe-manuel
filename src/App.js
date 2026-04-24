@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
+import CorreProfe from './CorreProfe';
 
 function App() {
   const [screen, setScreen] = useState('home');
@@ -57,6 +58,8 @@ function App() {
         return 'header-iaapps';
       case 'recursos':
         return 'header-recursos';
+      case 'juego':
+        return 'header-docentes';
       default:
         return 'header-home';
     }
@@ -87,6 +90,12 @@ function App() {
           gif: '/section-recursos.gif',
           title: 'Recursos',
           description: 'Materiales, documentos y apoyos listos para consultar o descargar.',
+        };
+      case 'juego':
+        return {
+          gif: '/section-docentes.gif',
+          title: 'Corre Profe, Corre',
+          description: 'Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.',
         };
       default:
         return {
@@ -139,6 +148,12 @@ function App() {
         description: 'Materiales, documentos y apoyos listos.',
         image: '/recursos.png',
         action: () => setScreen('recursos'),
+      },
+      {
+        title: 'Corre Profe, Corre',
+        description: 'Juego para sobrevivir a la carga administrativa y la jornada escolar.',
+        image: '/docentes.png',
+        action: () => setScreen('juego'),
       },
       {
         title: 'ProtocolIA',
@@ -382,6 +397,14 @@ function App() {
                   </div>
                 </div>
 
+                <div className="section-card green" onClick={() => setScreen('juego')}>
+                  <img src="/docentes.png" alt="Corre Profe Corre" className="section-card-image" />
+                  <div className="section-card-body">
+                    <h3>🎮 Corre Profe, Corre</h3>
+                    <p>Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.</p>
+                  </div>
+                </div>
+
                 <div className="section-card gray disabled-card">
                   <img src="/otros.png" alt="Próximamente" className="section-card-image" />
                   <div className="section-card-body">
@@ -519,6 +542,12 @@ function App() {
               <p>GPT para realizar solicitudes, acta de reunión, citatorios, exhortos, acta de hechos y más.</p>
             </div>
 
+            <div className={`card ${getCardClass()}`} onClick={() => setScreen('juego')}>
+              <img src="/docentes.png" alt="Corre Profe Corre" className="card-image" />
+              <h3>🎮 Corre Profe, Corre</h3>
+              <p>Juego para sobrevivir a la carga administrativa y la jornada escolar.</p>
+            </div>
+
             <div className={`card ${getCardClass()}`} onClick={() => openLink('#')}>
               <img src="/otros.png" alt="Otros" className="card-image" />
               <h3>Otros</h3>
@@ -604,6 +633,8 @@ function App() {
             </div>
           </div>
         )}
+
+        {screen === 'juego' && <CorreProfe />}
       </main>
 
       <nav className="bottom-nav">

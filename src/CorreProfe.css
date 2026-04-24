@@ -1,0 +1,121 @@
+.corre-profe-game {
+  text-align: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.corre-profe-game h1 {
+  margin-bottom: 5px;
+}
+
+.corre-profe-descripcion {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.corre-profe-marcador {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.corre-profe-escenario {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 230px;
+  margin: auto;
+  border: 4px solid #333;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(#dff3ff, #ffffff);
+}
+
+.corre-profe-escenario::after {
+  content: "";
+  position: absolute;
+  bottom: 35px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #333;
+}
+
+.corre-profe-personaje {
+  position: absolute;
+  left: 45px;
+  bottom: 42px;
+  font-size: 48px;
+  z-index: 2;
+}
+
+.corre-profe-personaje.brincando {
+  animation: correProfeSalto 0.55s ease;
+}
+
+.corre-profe-personaje.agachado {
+  bottom: 35px;
+  font-size: 38px;
+}
+
+.corre-profe-obstaculo {
+  position: absolute;
+  right: -60px;
+  font-size: 44px;
+  z-index: 2;
+  animation-name: correProfeMover;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.corre-profe-obstaculo.bajo {
+  bottom: 42px;
+}
+
+.corre-profe-obstaculo.alto {
+  bottom: 105px;
+}
+
+@keyframes correProfeSalto {
+  0% { bottom: 42px; }
+  50% { bottom: 125px; }
+  100% { bottom: 42px; }
+}
+
+@keyframes correProfeMover {
+  from { right: -60px; }
+  to { right: 100%; }
+}
+
+.corre-profe-controles {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.corre-profe-controles button,
+.corre-profe-game-over button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #1e88e5;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.corre-profe-game-over {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.92);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
