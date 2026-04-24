@@ -82,7 +82,7 @@ export default function CorreProfe() {
     }, velocidad);
 
     return () => clearInterval(cambio);
-  }, [velocidad, gameOver]);
+  }, [velocidad, gameOver, obstaculos]);
 
   const revisarChoque = () => {
     if (obstaculo.tipo === "bajo" && accion !== "brincando") {
