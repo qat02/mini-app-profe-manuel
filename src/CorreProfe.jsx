@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./CorreProfe.css";
 
 export default function CorreProfe() {
@@ -7,22 +7,30 @@ export default function CorreProfe() {
   const [record, setRecord] = useState(Number(localStorage.getItem("recordProfe")) || 0);
   const [gameOver, setGameOver] = useState(false);
   const [velocidad, setVelocidad] = useState(2200);
-  const [obstaculo, setObstaculo] = useState({ icono: "📚", tipo: "bajo", frase: "¡Brincaste las planeaciones!" });
+  const [obstaculo, setObstaculo] = useState({
+    icono: "📚",
+    tipo: "bajo",
+    frase: "¡Brincaste las planeaciones!",
+  });
 
   const fraseRef = useRef("");
 
-  const obstaculos = [
-    { icono: "📚", tipo: "bajo", frase: "¡Brincaste las planeaciones!" },
-    { icono: "📝", tipo: "bajo", frase: "¡Superaste los exámenes!" },
-    { icono: "👨‍💼", tipo: "bajo", frase: "¡Sobreviviste al director!" },
-    { icono: "👨‍👩‍👧", tipo: "alto", frase: "¡Recibiste al padre de familia!" },
-    { icono: "🧑‍🏫", tipo: "alto", frase: "¡Superaste al ATP!" },
-    { icono: "📄", tipo: "alto", frase: "¡Esquivaste los oficios!" },
-  ];
+  const obstaculos = useMemo(
+    () => [
+      { icono: "📚", tipo: "bajo", frase: "¡Brincaste las planeaciones!" },
+      { icono: "📝", tipo: "bajo", frase: "¡Superaste los exámenes!" },
+      { icono: "👨‍💼", tipo: "bajo", frase: "¡Sobreviviste al director!" },
+      { icono: "👨‍👩‍👧", tipo: "alto", frase: "¡Recibiste al padre de familia!" },
+      { icono: "🧑‍🏫", tipo: "alto", frase: "¡Superaste al ATP!" },
+      { icono: "📄", tipo: "alto", frase: "¡Esquivaste los oficios!" },
+    ],
+    []
+  );
 
   const brincar = () => {
     if (gameOver) return reiniciar();
     if (accion !== "normal") return;
+
     setAccion("brincando");
     setTimeout(() => setAccion("normal"), 550);
   };
@@ -30,6 +38,7 @@ export default function CorreProfe() {
   const agacharse = () => {
     if (gameOver) return reiniciar();
     if (accion !== "normal") return;
+
     setAccion("agachado");
     setTimeout(() => setAccion("normal"), 550);
   };
