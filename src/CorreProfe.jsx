@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./CorreProfe.css";
 
 export default function CorreProfe() {
@@ -6,59 +6,145 @@ export default function CorreProfe() {
   const [puntos, setPuntos] = useState(0);
   const [record, setRecord] = useState(Number(localStorage.getItem("recordProfe")) || 0);
   const [gameOver, setGameOver] = useState(false);
-  const [velocidad, setVelocidad] = useState(2600);
-  const [obstaculo, setObstaculo] = useState({
-    icono: "📚",
-    tipo: "bajo",
-    derrota: "Te vencieron las planeaciones.",
-  });
+  const [obstaculos, setObstaculos] = useState([]);
+  const [estrellas, setEstrellas] = useState([]);
+  const [plus, setPlus] = useState([]);
+  const [estrellasTomadas, setEstrellasTomadas] = useState(0);
+  const [bonoTotal, setBonoTotal] = useState(0);
 
-  const personajeRef = useRef(null);
-  const obstaculoRef = useRef(null);
-  const animacionRef = useRef(null);
+  const accionRef = useRef("normal");
+  const gameOverRef = useRef(false);
+  const puntosRef = useRef(0);
+  const tiempoRef = useRef(0);
+  const spawnRef = useRef(0);
+  const starRef = useRef(0);
+  const idRef = useRef(1);
   const mensajeDerrotaRef = useRef("");
 
-  const obstaculos = useMemo(
-    () => [
-      { icono: "📚", tipo: "bajo", derrota: "Te vencieron las planeaciones." },
-      { icono: "📝", tipo: "bajo", derrota: "Te vencieron los exámenes sin revisar." },
-      { icono: "👨‍💼", tipo: "bajo", derrota: "Te venció el director." },
-      { icono: "👨‍👩‍👧", tipo: "alto", derrota: "Te vencieron los padres de familia." },
-      { icono: "🧑‍🏫", tipo: "alto", derrota: "Te venció el ATP." },
-      { icono: "📄", tipo: "alto", derrota: "Te vencieron los oficios urgentes." },
-    ],
+  const playSound = (type) => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
+
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (type === "jump") {
+        oscillator.frequency.value = 520;
+        gainNode.gain.value = 0.08;
+      }
+
+      if (type === "star") {
+        oscillator.frequency.value = 880;
+        gainNode.gain.value = 0.1;
+      }
+
+      if (type === "lose") {
+        oscillator.frequency.value = 180;
+        gainNode.gain.value = 0.12;
+      }
+
+      oscillator.type = "sine";
+      oscillator.start();
+
+      setTimeout(() => {
+        oscillator.stop();
+        audioCtx.close();
+      }, type === "lose" ? 400 : 120);
+    } catch (error) {
+      console.log("Audio no disponible");
+    }
+  };
+
+  const catalogo = useMemo(
+    () => ({
+      bajo: [
+        { icono: "📚", derrota: "Te vencieron las planeaciones." },
+        { icono: "📝", derrota: "Te vencieron los exámenes." },
+        { icono: "👨‍💼", derrota: "Te venció el director." },
+      ],
+      alto: [
+        { icono: "👨‍👩‍👧", derrota: "Te vencieron los padres de familia." },
+        { icono: "🧑‍🏫", derrota: "Te venció el ATP." },
+        { icono: "📄", derrota: "Te vencieron los oficios urgentes." },
+      ],
+    }),
     []
   );
 
-  const brincar = () => {
-    if (gameOver) return reiniciar();
-    if (accion !== "normal") return;
+  useEffect(() => {
+    accionRef.current = accion;
+  }, [accion]);
 
+  useEffect(() => {
+    gameOverRef.current = gameOver;
+  }, [gameOver]);
+
+  useEffect(() => {
+    if (puntos > record) {
+      setRecord(puntos);
+      localStorage.setItem("recordProfe", puntos);
+    }
+  }, [puntos, record]);
+
+  const crearObstaculo = useCallback(
+    (tipo, xExtra = 0) => {
+      const lista = catalogo[tipo];
+      const item = lista[Math.floor(Math.random() * lista.length)];
+
+      return {
+        id: idRef.current++,
+        tipo,
+        icono: item.icono,
+        derrota: item.derrota,
+        x: 650 + xExtra,
+      };
+    },
+    [catalogo]
+  );
+
+  const crearEstrella = () => ({
+    id: idRef.current++,
+    x: 650,
+    nivel: Math.random() > 0.5 ? "alta" : "baja",
+  });
+
+  const brincar = useCallback(() => {
+    if (gameOverRef.current) return reiniciar();
+    if (accionRef.current !== "normal") return;
+
+    playSound("jump");
     setAccion("brincando");
-    setTimeout(() => setAccion("normal"), 650);
-  };
+    setTimeout(() => setAccion("normal"), 680);
+  }, []);
 
-  const agacharse = () => {
-    if (gameOver) return reiniciar();
-    if (accion !== "normal") return;
+  const agacharse = useCallback(() => {
+    if (gameOverRef.current) return reiniciar();
+    if (accionRef.current !== "normal") return;
 
     setAccion("agachado");
-    setTimeout(() => setAccion("normal"), 500);
-  };
+    setTimeout(() => setAccion("normal"), 520);
+  }, []);
 
-  const reiniciar = () => {
-    setPuntos(0);
-    setVelocidad(2600);
-    setGameOver(false);
-    setAccion("normal");
+  function reiniciar() {
+    puntosRef.current = 0;
+    tiempoRef.current = 0;
+    spawnRef.current = 0;
+    starRef.current = 0;
     mensajeDerrotaRef.current = "";
-  };
 
-  const cambiarObstaculo = () => {
-    const nuevo = obstaculos[Math.floor(Math.random() * obstaculos.length)];
-    setObstaculo(nuevo);
-    mensajeDerrotaRef.current = nuevo.derrota;
-  };
+    setPuntos(0);
+    setObstaculos([]);
+    setEstrellas([]);
+    setPlus([]);
+    setEstrellasTomadas(0);
+    setBonoTotal(0);
+    setAccion("normal");
+    setGameOver(false);
+  }
 
   useEffect(() => {
     const tecla = (e) => {
@@ -68,76 +154,128 @@ export default function CorreProfe() {
 
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
-  });
+  }, [brincar, agacharse]);
 
   useEffect(() => {
-    if (gameOver) return;
+    let raf;
+    let last = performance.now();
 
-    const puntosInterval = setInterval(() => {
-      setPuntos((p) => p + 1);
-    }, 250);
+    const loop = (now) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
 
-    return () => clearInterval(puntosInterval);
-  }, [gameOver]);
+      if (!gameOverRef.current) {
+        tiempoRef.current += dt;
 
-  useEffect(() => {
-    if (puntos > record) {
-      setRecord(puntos);
-      localStorage.setItem("recordProfe", puntos);
-    }
+        const velocidad = Math.min(170 + tiempoRef.current * 8, 430);
+        const intervalo = Math.max(1.45 - tiempoRef.current * 0.015, 0.72);
+        const probabilidadDoble = Math.min(tiempoRef.current / 90, 0.42);
 
-    if (puntos > 0 && puntos % 35 === 0) {
-      setVelocidad((v) => Math.max(1300, v - 120));
-    }
-  }, [puntos, record]);
+        puntosRef.current += dt * 7;
+        setPuntos(Math.floor(puntosRef.current));
 
-  useEffect(() => {
-    if (gameOver) return;
+        spawnRef.current += dt;
+        starRef.current += dt;
 
-    const revisarColision = () => {
-      const personaje = personajeRef.current;
-      const obstaculoActual = obstaculoRef.current;
+        if (spawnRef.current >= intervalo) {
+          spawnRef.current = 0;
 
-      if (!personaje || !obstaculoActual) {
-        animacionRef.current = requestAnimationFrame(revisarColision);
-        return;
+          const tipo1 = Math.random() > 0.5 ? "bajo" : "alto";
+          const nuevos = [crearObstaculo(tipo1)];
+
+          if (Math.random() < probabilidadDoble) {
+            const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
+            nuevos.push(crearObstaculo(tipo2, 135 + Math.random() * 70));
+          }
+
+          setObstaculos((prev) => [...prev, ...nuevos]);
+        }
+
+        if (starRef.current >= 4.8 + Math.random() * 2) {
+          starRef.current = 0;
+          setEstrellas((prev) => [...prev, crearEstrella()]);
+        }
+
+        setObstaculos((prev) => {
+          const movidos = prev
+            .map((o) => ({ ...o, x: o.x - velocidad * dt }))
+            .filter((o) => o.x > -80);
+
+          const golpe = movidos.find((o) => o.x < 95 && o.x > 35);
+
+          if (golpe) {
+            const accionActual = accionRef.current;
+
+            if (golpe.tipo === "bajo" && accionActual !== "brincando") {
+              mensajeDerrotaRef.current = golpe.derrota;
+              playSound("lose");
+              setGameOver(true);
+            }
+
+            if (golpe.tipo === "alto" && accionActual !== "agachado") {
+              mensajeDerrotaRef.current = golpe.derrota;
+              playSound("lose");
+              setGameOver(true);
+            }
+          }
+
+          return movidos;
+        });
+
+        setEstrellas((prev) => {
+          const restantes = [];
+
+          prev.forEach((s) => {
+            const nuevaX = s.x - velocidad * dt;
+            const cerca = nuevaX < 95 && nuevaX > 35;
+
+            const puedeTomarla =
+              (s.nivel === "alta" && accionRef.current === "brincando") ||
+              (s.nivel === "baja" && accionRef.current !== "brincando");
+
+            if (cerca && puedeTomarla) {
+              playSound("star");
+              puntosRef.current += 50;
+              setPuntos(Math.floor(puntosRef.current));
+              setEstrellasTomadas((v) => v + 1);
+              setBonoTotal((v) => v + 50);
+
+              setPlus((prevPlus) => [
+                ...prevPlus,
+                {
+                  id: idRef.current++,
+                  x: 90,
+                  y: s.nivel === "alta" ? 80 : 135,
+                },
+              ]);
+            } else if (nuevaX > -60) {
+              restantes.push({ ...s, x: nuevaX });
+            }
+          });
+
+          return restantes;
+        });
+
+        setPlus((prev) =>
+          prev
+            .map((p) => ({ ...p, y: p.y - 1.5 }))
+            .filter((p) => p.y > 25)
+        );
       }
 
-      const p = personaje.getBoundingClientRect();
-      const o = obstaculoActual.getBoundingClientRect();
-
-      // Margen de perdón: hace que la colisión no sea tan estricta.
-      const margenHorizontal = 18;
-      const margenVertical = 14;
-
-      const chocan =
-        p.right - margenHorizontal > o.left + margenHorizontal &&
-        p.left + margenHorizontal < o.right - margenHorizontal &&
-        p.bottom - margenVertical > o.top + margenVertical &&
-        p.top + margenVertical < o.bottom - margenVertical;
-
-      if (chocan) {
-        setGameOver(true);
-        return;
-      }
-
-      animacionRef.current = requestAnimationFrame(revisarColision);
+      raf = requestAnimationFrame(loop);
     };
 
-    animacionRef.current = requestAnimationFrame(revisarColision);
-
-    return () => cancelAnimationFrame(animacionRef.current);
-  }, [gameOver, obstaculo]);
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [crearObstaculo]);
 
   const tocarPantalla = (e) => {
-    const mitad = window.innerHeight / 2;
     const y = e.clientY || e.touches?.[0]?.clientY;
+    const mitad = window.innerHeight / 2;
 
-    if (y < mitad) {
-      brincar();
-    } else {
-      agacharse();
-    }
+    if (y < mitad) brincar();
+    else agacharse();
   };
 
   return (
@@ -150,25 +288,44 @@ export default function CorreProfe() {
 
       <div className="corre-profe-marcador">
         <span>Puntos: {puntos}</span>
-        <span>Mejor jornada docente: {record}</span>
+        <span>Récord: {record}</span>
+        <span>⭐ {estrellasTomadas}</span>
       </div>
 
       <div className="corre-profe-escenario" onClick={tocarPantalla}>
-        <div ref={personajeRef} className={`corre-profe-personaje ${accion}`}>
+        <div className={`corre-profe-personaje ${accion}`}>
           {accion === "agachado" ? "🙇‍♂️" : "👨‍🏫"}
         </div>
 
-        {!gameOver && (
+        {obstaculos.map((o) => (
           <div
-            key={`${obstaculo.icono}-${velocidad}`}
-            ref={obstaculoRef}
-            className={`corre-profe-obstaculo ${obstaculo.tipo}`}
-            style={{ animationDuration: `${velocidad}ms` }}
-            onAnimationIteration={cambiarObstaculo}
+            key={o.id}
+            className={`corre-profe-obstaculo ${o.tipo}`}
+            style={{ transform: `translateX(${o.x}px)` }}
           >
-            {obstaculo.icono}
+            {o.icono}
           </div>
-        )}
+        ))}
+
+        {estrellas.map((s) => (
+          <div
+            key={s.id}
+            className={`corre-profe-estrella ${s.nivel}`}
+            style={{ transform: `translateX(${s.x}px)` }}
+          >
+            ⭐
+          </div>
+        ))}
+
+        {plus.map((p) => (
+          <div
+            key={p.id}
+            className="corre-profe-plus"
+            style={{ left: `${p.x}px`, top: `${p.y}px` }}
+          >
+            +50 pts
+          </div>
+        ))}
 
         <div className="touch-zone touch-top">TOCA ARRIBA PARA BRINCAR</div>
         <div className="touch-zone touch-bottom">TOCA ABAJO PARA AGACHARTE</div>
@@ -177,8 +334,14 @@ export default function CorreProfe() {
           <div className="corre-profe-game-over">
             <h2>😵 Fin de la jornada</h2>
             <div className="puntaje-final">{puntos}</div>
-            <p className="texto-puntaje">puntos logrados</p>
+            <p className="texto-puntaje">puntos totales</p>
             <p className="mensaje-derrota">{mensajeDerrotaRef.current}</p>
+
+            <div className="resumen-bono">
+              <p>⭐ Estrellas tomadas: {estrellasTomadas}</p>
+              <p>🎁 Bono ganado: +{bonoTotal} pts</p>
+            </div>
+
             <button onClick={reiniciar}>Reiniciar</button>
           </div>
         )}
