@@ -21,13 +21,18 @@ export default function CorreProfe() {
 
   const accionRef = useRef("normal");
   const gameOverRef = useRef(false);
-  const puntosRef = useRef(0);
+
+  const puntosBaseRef = useRef(0);
+  const bonoTotalRef = useRef(0);
+  const estrellasTomadasRef = useRef(0);
+  const estrellasCobradasRef = useRef(new Set());
+
   const spawnRef = useRef(0);
   const starRef = useRef(0);
   const idRef = useRef(1);
   const mensajeDerrotaRef = useRef("");
 
-  const playSound = (type) => {
+  const playSound = useCallback((type) => {
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       const audioCtx = new AudioContext();
@@ -40,7 +45,10 @@ export default function CorreProfe() {
         oscillator.frequency.value = freq;
         oscillator.connect(gainNode);
         gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioCtx.currentTime + delay + duration
+        );
         oscillator.start(audioCtx.currentTime + delay);
         oscillator.stop(audioCtx.currentTime + delay + duration);
       };
@@ -71,7 +79,7 @@ export default function CorreProfe() {
     } catch {
       console.log("Audio no disponible");
     }
-  };
+  }, []);
 
   const catalogo = useMemo(
     () => ({
@@ -97,42 +105,72 @@ export default function CorreProfe() {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
-  const obtenerNivel = () => Math.min(10, Math.floor(puntosRef.current / 200) + 1);
+  const obtenerTotal = () => {
+    return Math.floor(puntosBaseRef.current) + bonoTotalRef.current;
+  };
 
   const crearObstaculo = useCallback(
     (tipo, xExtra = 0) => {
       const lista = catalogo[tipo];
       const item = lista[Math.floor(Math.random() * lista.length)];
+
       return {
         id: idRef.current++,
         tipo,
         icono: item.icono,
         derrota: item.derrota,
-        x: 760 + xExtra,
+        x: 820 + xExtra,
       };
     },
     [catalogo]
   );
 
-  const crearEstrella = () => ({
-    id: idRef.current++,
-    x: 760,
-    nivel: Math.random() > 0.5 ? "alta" : "baja",
-  });
+  const crearEstrella = useCallback(
+    () => ({
+      id: idRef.current++,
+      x: 820,
+      nivel: Math.random() > 0.5 ? "alta" : "baja",
+    }),
+    []
+  );
 
   const guardarNuevoRecord = (nombre) => {
     const limpio = nombre.trim() || "Profe anónimo";
-    const total = Math.floor(puntosRef.current);
+    const total = obtenerTotal();
+
     localStorage.setItem("recordProfe", total);
     localStorage.setItem("recordProfeNombre", limpio);
+
     setRecord(total);
     setNombreRecord(limpio);
     setNuevoRecord(false);
   };
 
+  const terminarJuego = useCallback(
+    (mensaje) => {
+      const totalFinal = Math.floor(puntosBaseRef.current) + bonoTotalRef.current;
+
+      mensajeDerrotaRef.current = mensaje;
+      setPuntos(totalFinal);
+      playSound("lose");
+      setGameOver(true);
+
+      if (totalFinal > record) {
+        playSound("record");
+        setNuevoRecord(true);
+      }
+    },
+    [playSound, record]
+  );
+
   const reiniciar = useCallback(() => {
     playSound("restart");
-    puntosRef.current = 0;
+
+    puntosBaseRef.current = 0;
+    bonoTotalRef.current = 0;
+    estrellasTomadasRef.current = 0;
+    estrellasCobradasRef.current = new Set();
+
     spawnRef.current = 0;
     starRef.current = 0;
     mensajeDerrotaRef.current = "";
@@ -147,7 +185,7 @@ export default function CorreProfe() {
     setGameOver(false);
     setNuevoRecord(false);
     setNombreJugador("");
-  }, []);
+  }, [playSound]);
 
   const brincar = useCallback(() => {
     if (gameOverRef.current) return reiniciar();
@@ -156,7 +194,7 @@ export default function CorreProfe() {
     playSound("jump");
     setAccion("brincando");
     setTimeout(() => setAccion("normal"), 700);
-  }, [reiniciar]);
+  }, [playSound, reiniciar]);
 
   const agacharse = useCallback(() => {
     if (gameOverRef.current) return reiniciar();
@@ -164,8 +202,8 @@ export default function CorreProfe() {
 
     playSound("duck");
     setAccion("agachado");
-    setTimeout(() => setAccion("normal"), 360);
-  }, [reiniciar]);
+    setTimeout(() => setAccion("normal"), 500);
+  }, [playSound, reiniciar]);
 
   useEffect(() => {
     const tecla = (e) => {
@@ -186,13 +224,16 @@ export default function CorreProfe() {
       last = now;
 
       if (!gameOverRef.current) {
-        const nivel = obtenerNivel();
-        const velocidad = 145 + nivel * 32;
-        const intervalo = Math.max(2.05 - nivel * 0.06, 1.4);
-        const probabilidadDoble = nivel < 4 ? 0 : Math.min((nivel - 3) * 0.035, 0.22);
+        const totalActual = Math.floor(puntosBaseRef.current) + bonoTotalRef.current;
+        const nivel = Math.floor(totalActual / 200) + 1;
 
-        puntosRef.current += dt * 7;
-        setPuntos(Math.floor(puntosRef.current));
+        const velocidad = 150 + nivel * 18;
+        const intervalo = Math.max(2.35 - nivel * 0.025, 1.75);
+        const probabilidadDoble =
+          nivel < 6 ? 0 : Math.min((nivel - 5) * 0.015, 0.12);
+
+        puntosBaseRef.current += dt * 7;
+        setPuntos(Math.floor(puntosBaseRef.current) + bonoTotalRef.current);
 
         spawnRef.current += dt;
         starRef.current += dt;
@@ -205,7 +246,7 @@ export default function CorreProfe() {
 
           if (Math.random() < probabilidadDoble) {
             const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
-            nuevos.push(crearObstaculo(tipo2, 330 + Math.random() * 140));
+            nuevos.push(crearObstaculo(tipo2, 520 + Math.random() * 180));
           }
 
           setObstaculos((prev) => [...prev, ...nuevos]);
@@ -230,14 +271,7 @@ export default function CorreProfe() {
               (golpe.tipo === "bajo" && accionActual !== "brincando") ||
               (golpe.tipo === "alto" && accionActual !== "agachado")
             ) {
-              mensajeDerrotaRef.current = golpe.derrota;
-              playSound("lose");
-              setGameOver(true);
-
-              if (Math.floor(puntosRef.current) > record) {
-                playSound("record");
-                setNuevoRecord(true);
-              }
+              terminarJuego(golpe.derrota);
             }
           }
 
@@ -255,12 +289,20 @@ export default function CorreProfe() {
               (s.nivel === "alta" && accionRef.current === "brincando") ||
               (s.nivel === "baja" && accionRef.current !== "brincando");
 
-            if (cerca && puedeTomarla) {
+            if (cerca && puedeTomarla && !estrellasCobradasRef.current.has(s.id)) {
+              estrellasCobradasRef.current.add(s.id);
+
               playSound("star");
-              puntosRef.current += 10;
-              setPuntos(Math.floor(puntosRef.current));
-              setEstrellasTomadas((v) => v + 1);
-              setBonoTotal((v) => v + 10);
+
+              bonoTotalRef.current += 10;
+              estrellasTomadasRef.current += 1;
+
+              const totalActualizado =
+                Math.floor(puntosBaseRef.current) + bonoTotalRef.current;
+
+              setPuntos(totalActualizado);
+              setEstrellasTomadas(estrellasTomadasRef.current);
+              setBonoTotal(bonoTotalRef.current);
 
               setPlus((prevPlus) => [
                 ...prevPlus,
@@ -270,7 +312,7 @@ export default function CorreProfe() {
                   y: s.nivel === "alta" ? 80 : 135,
                 },
               ]);
-            } else if (nuevaX > -60) {
+            } else if (nuevaX > -60 && !estrellasCobradasRef.current.has(s.id)) {
               restantes.push({ ...s, x: nuevaX });
             }
           });
@@ -278,7 +320,9 @@ export default function CorreProfe() {
           return restantes;
         });
 
-        setPlus((prev) => prev.map((p) => ({ ...p, y: p.y - 1.5 })).filter((p) => p.y > 25));
+        setPlus((prev) =>
+          prev.map((p) => ({ ...p, y: p.y - 1.5 })).filter((p) => p.y > 25)
+        );
       }
 
       raf = requestAnimationFrame(loop);
@@ -286,7 +330,7 @@ export default function CorreProfe() {
 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [crearObstaculo, record]);
+  }, [crearObstaculo, crearEstrella, playSound, terminarJuego]);
 
   const tocarPantalla = (e) => {
     const y = e.clientY || e.touches?.[0]?.clientY;
@@ -306,7 +350,7 @@ export default function CorreProfe() {
 
       <div className="corre-profe-marcador">
         <span>Puntos: {puntos}</span>
-        <span>Nivel: {Math.min(10, Math.floor(puntos / 200) + 1)}</span>
+        <span>Nivel: {Math.floor(puntos / 200) + 1}</span>
         <span>🏆 Récord: {record}</span>
         <span>👤 {nombreRecord}</span>
         <span>⭐ {estrellasTomadas}</span>
@@ -375,11 +419,15 @@ export default function CorreProfe() {
                     placeholder="Tu nombre"
                     maxLength="18"
                   />
-                  <button onClick={() => guardarNuevoRecord(nombreJugador)}>Guardar récord</button>
+                  <button onClick={() => guardarNuevoRecord(nombreJugador)}>
+                    Guardar récord
+                  </button>
                 </div>
               )}
 
-              <button onClick={reiniciar}>{nuevoRecord ? "Jugar otra vez" : "Reiniciar"}</button>
+              <button onClick={reiniciar}>
+                {nuevoRecord ? "Jugar otra vez" : "Reiniciar"}
+              </button>
             </div>
           </div>
         )}
