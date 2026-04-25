@@ -13,25 +13,33 @@ export default function CorreProfe() {
   const [nombreRecord, setNombreRecord] = useState(nombreGuardado);
   const [nuevoRecord, setNuevoRecord] = useState(false);
   const [nombreJugador, setNombreJugador] = useState("");
-
+  const [flash, setFlash] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [obstaculos, setObstaculos] = useState([]);
   const [estrellas, setEstrellas] = useState([]);
+  const [quincenas, setQuincenas] = useState([]);
   const [plus, setPlus] = useState([]);
   const [estrellasTomadas, setEstrellasTomadas] = useState(0);
   const [bonoTotal, setBonoTotal] = useState(0);
+  const [modoSayayin, setModoSayayin] = useState(false);
 
   const accionRef = useRef("normal");
   const gameOverRef = useRef(false);
+  const modoSayayinRef = useRef(false);
   const scoreRef = useRef(0);
   const bonoRef = useRef(0);
   const estrellasRef = useRef(0);
+  const estrellasDesdePoderRef = useRef(0);
   const estrellasCobradasRef = useRef(new Set());
 
   const spawnRef = useRef(0);
   const starRef = useRef(0);
   const idRef = useRef(1);
   const mensajeDerrotaRef = useRef("");
+  const sayayinTimeoutRef = useRef(null);
+
+  const musicaRef = useRef(null);
+  const musicaIniciadaRef = useRef(false);
 
   const fondos = ["/fondo-1.png", "/fondo-2.png", "/fondo-3.png", "/fondo-4.png", "/fondo-5.png"];
 
@@ -41,6 +49,41 @@ export default function CorreProfe() {
   const abrirRanking = () => {
     window.open(RANKING_URL, "_blank", "noopener,noreferrer");
   };
+
+  const iniciarMusica = useCallback(() => {
+    if (!musicaIniciadaRef.current && musicaRef.current) {
+      musicaRef.current.volume = 0.2;
+      musicaRef.current.play().catch(() => {});
+      musicaIniciadaRef.current = true;
+    }
+  }, []);
+
+  const activarSayayin = useCallback(() => {
+    const audio = new Audio("/sayayin.mp3");
+    audio.volume = 0.65;
+    audio.play().catch(() => {});
+
+    setFlash(true);
+    setTimeout(() => setFlash(false), 200);
+
+    if (navigator.vibrate) {
+      navigator.vibrate(120);
+    }
+
+    setModoSayayin(true);
+    modoSayayinRef.current = true;
+    setEstrellas([]);
+
+    if (sayayinTimeoutRef.current) {
+      clearTimeout(sayayinTimeoutRef.current);
+    }
+
+    sayayinTimeoutRef.current = setTimeout(() => {
+      setModoSayayin(false);
+      modoSayayinRef.current = false;
+      starRef.current = 0;
+    }, 7500);
+  }, []);
 
   const playSound = useCallback((type) => {
     try {
@@ -184,13 +227,17 @@ export default function CorreProfe() {
     gameOverRef.current = gameOver;
   }, [gameOver]);
 
+  useEffect(() => {
+    modoSayayinRef.current = modoSayayin;
+  }, [modoSayayin]);
+
   const elegirItem = useCallback((nivel, grupoTipo) => {
     const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
     const lista = catalogos[grupo][grupoTipo];
     return lista[Math.floor(Math.random() * lista.length)];
   }, [catalogos]);
 
-  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0) => {
+  const crearObstaculo = useCallback((tipo, nivel, xExtra = 0, requisitoForzado = null) => {
     if (tipo === "doble-brinco") {
       const bajo = elegirItem(nivel, "bajo");
       const alto = elegirItem(nivel, "alto");
@@ -228,11 +275,35 @@ export default function CorreProfe() {
     return {
       id: idRef.current++,
       tipo,
+      requisitoForzado,
       icono: item.icono,
       derrota: item.derrota,
       x: 820 + xExtra,
     };
   }, [elegirItem]);
+
+  const crearCombo = useCallback((nivel) => {
+    const separacion = 720;
+
+    const combos = [
+      ["bajo", "bajo"],
+      ["alto-forzado", "alto-forzado"],
+      ["alto-forzado", "bajo"],
+      ["bajo", "alto-forzado"],
+    ];
+
+    const elegido = combos[Math.floor(Math.random() * combos.length)];
+
+    return elegido.map((tipo, index) => {
+      const xExtra = index === 0 ? 0 : separacion;
+
+      if (tipo === "alto-forzado") {
+        return crearObstaculo("alto", nivel, xExtra, "agachado");
+      }
+
+      return crearObstaculo(tipo, nivel, xExtra);
+    });
+  }, [crearObstaculo]);
 
   const crearEstrella = useCallback(() => ({
     id: idRef.current++,
@@ -258,20 +329,44 @@ export default function CorreProfe() {
     mensajeDerrotaRef.current = mensaje;
     setPuntos(totalFinal);
     playSound("lose");
+
+    if (musicaRef.current) {
+      musicaRef.current.pause();
+    }
+
+    if (sayayinTimeoutRef.current) {
+      clearTimeout(sayayinTimeoutRef.current);
+    }
+
+    setModoSayayin(false);
+    modoSayayinRef.current = false;
+
     setGameOver(true);
 
     if (totalFinal > record) {
       playSound("record");
       setNuevoRecord(true);
+
+      setRecord(totalFinal);
     }
   }, [playSound, record]);
 
   const reiniciar = useCallback(() => {
     playSound("restart");
 
+    if (musicaRef.current) {
+      musicaRef.current.currentTime = 0;
+      musicaIniciadaRef.current = false;
+    }
+
+    if (sayayinTimeoutRef.current) {
+      clearTimeout(sayayinTimeoutRef.current);
+    }
+
     scoreRef.current = 0;
     bonoRef.current = 0;
     estrellasRef.current = 0;
+    estrellasDesdePoderRef.current = 0;
     estrellasCobradasRef.current = new Set();
 
     spawnRef.current = 0;
@@ -281,9 +376,12 @@ export default function CorreProfe() {
     setPuntos(0);
     setObstaculos([]);
     setEstrellas([]);
+    setQuincenas([]);
     setPlus([]);
     setEstrellasTomadas(0);
     setBonoTotal(0);
+    setModoSayayin(false);
+    modoSayayinRef.current = false;
     setAccion("normal");
     setGameOver(false);
     setNuevoRecord(false);
@@ -294,19 +392,21 @@ export default function CorreProfe() {
     if (gameOverRef.current) return reiniciar();
     if (accionRef.current !== "normal") return;
 
+    iniciarMusica();
     playSound("jump");
     setAccion("brincando");
     setTimeout(() => setAccion("normal"), 700);
-  }, [playSound, reiniciar]);
+  }, [iniciarMusica, playSound, reiniciar]);
 
   const agacharse = useCallback(() => {
     if (gameOverRef.current) return reiniciar();
     if (accionRef.current !== "normal") return;
 
+    iniciarMusica();
     playSound("duck");
     setAccion("agachado");
     setTimeout(() => setAccion("normal"), 500);
-  }, [playSound, reiniciar]);
+  }, [iniciarMusica, playSound, reiniciar]);
 
   useEffect(() => {
     const tecla = (e) => {
@@ -342,33 +442,44 @@ export default function CorreProfe() {
         const probabilidadDoble =
           nivel < 5 ? 0 : Math.min(0.18 + (nivel - 5) * 0.035, 0.36);
 
+        const probabilidadCombo =
+          nivel < 3 ? 0 : nivel < 5 ? 0.35 : Math.min(0.32 + (nivel - 5) * 0.025, 0.50);
+
         scoreRef.current += dt * 7;
         setPuntos(Math.floor(scoreRef.current));
 
         spawnRef.current += dt;
-        starRef.current += dt;
+
+        if (!modoSayayinRef.current) {
+          starRef.current += dt;
+        }
 
         if (spawnRef.current >= intervalo) {
           spawnRef.current = 0;
 
-          let tipo1 = Math.random() > 0.5 ? "bajo" : "alto";
+          const nuevos = [];
+          const azar = Math.random();
 
-          if (nivel >= 5 && Math.random() < probabilidadDoble) {
-            tipo1 = Math.random() > 0.5 ? "doble-brinco" : "doble-agacharse";
-          }
+          if (nivel >= 5 && azar < probabilidadDoble) {
+            const tipoDoble = Math.random() > 0.5 ? "doble-brinco" : "doble-agacharse";
+            nuevos.push(crearObstaculo(tipoDoble, nivel));
+          } else if (nivel >= 3 && azar < probabilidadDoble + probabilidadCombo) {
+            nuevos.push(...crearCombo(nivel));
+          } else {
+            const tipo1 = Math.random() > 0.5 ? "bajo" : "alto";
+            nuevos.push(crearObstaculo(tipo1, nivel));
 
-          const nuevos = [crearObstaculo(tipo1, nivel)];
-
-          if (nivel >= 6 && Math.random() < probabilidadDoble * 0.5) {
-            const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
-            const separacionSegura = 620 + Math.random() * 210;
-            nuevos.push(crearObstaculo(tipo2, nivel, separacionSegura));
+            if (nivel >= 6 && Math.random() < probabilidadDoble * 0.5) {
+              const tipo2 = Math.random() > 0.5 ? "bajo" : "alto";
+              const separacionSegura = 720;
+              nuevos.push(crearObstaculo(tipo2, nivel, separacionSegura));
+            }
           }
 
           setObstaculos((prev) => [...prev, ...nuevos]);
         }
 
-        if (starRef.current >= 5.6 + Math.random() * 2.4) {
+        if (!modoSayayinRef.current && starRef.current >= 5.6 + Math.random() * 2.4) {
           starRef.current = 0;
           setEstrellas((prev) => [...prev, crearEstrella()]);
         }
@@ -378,14 +489,14 @@ export default function CorreProfe() {
             .map((o) => ({ ...o, x: o.x - velocidad * dt }))
             .filter((o) => o.x > -90);
 
-          const golpe = movidos.find((o) => o.x < 105 && o.x > 40);
+          const golpe = movidos.find((o) => o.x < 92 && o.x > 58);
 
-          if (golpe) {
+          if (golpe && !modoSayayinRef.current) {
             const accionActual = accionRef.current;
 
             if (
               (golpe.tipo === "bajo" && accionActual !== "brincando") ||
-              (golpe.tipo === "alto" && accionActual !== "agachado") ||
+              (golpe.tipo === "alto" && accionActual === "normal") ||
               (golpe.tipo === "doble-brinco" && accionActual !== "brincando") ||
               (golpe.tipo === "doble-agacharse" && accionActual !== "agachado")
             ) {
@@ -414,6 +525,7 @@ export default function CorreProfe() {
               scoreRef.current += 10;
               bonoRef.current += 10;
               estrellasRef.current += 1;
+              estrellasDesdePoderRef.current += 1;
 
               setPuntos(Math.floor(scoreRef.current));
               setEstrellasTomadas(estrellasRef.current);
@@ -427,8 +539,37 @@ export default function CorreProfe() {
                   y: s.nivel === "alta" ? 80 : 135,
                 },
               ]);
+
+              if (estrellasDesdePoderRef.current >= 6) {
+                estrellasDesdePoderRef.current = 0;
+                setQuincenas((prevQuincenas) => [
+                  ...prevQuincenas,
+                  {
+                    id: idRef.current++,
+                    x: 820,
+                  },
+                ]);
+              }
             } else if (nuevaX > -60 && !estrellasCobradasRef.current.has(s.id)) {
               restantes.push({ ...s, x: nuevaX });
+            }
+          });
+
+          return restantes;
+        });
+
+        setQuincenas((prev) => {
+          const restantes = [];
+
+          prev.forEach((q) => {
+            const nuevaX = q.x - velocidad * dt;
+            const cerca = nuevaX < 92 && nuevaX > 58;
+            const tocaBolsa = cerca && accionRef.current === "brincando";
+            
+            if (tocaBolsa) {
+              activarSayayin();
+            } else if (nuevaX > -60) {
+              restantes.push({ ...q, x: nuevaX });
             }
           });
 
@@ -445,7 +586,7 @@ export default function CorreProfe() {
 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [crearObstaculo, crearEstrella, playSound, terminarJuego]);
+  }, [crearObstaculo, crearCombo, crearEstrella, playSound, terminarJuego, activarSayayin]);
 
   const tocarPantalla = (e) => {
     const y = e.clientY || e.touches?.[0]?.clientY;
@@ -457,6 +598,8 @@ export default function CorreProfe() {
 
   return (
     <div className="corre-profe-game">
+      <audio ref={musicaRef} src="/fondo-midi.mp3" loop />
+
       <h1>🎮 Corre Profe, Corre</h1>
 
       <p className="corre-profe-descripcion">
@@ -469,6 +612,7 @@ export default function CorreProfe() {
         <span>🏆 Récord: {record}</span>
         <span>👤 {nombreRecord}</span>
         <span>⭐ {estrellasTomadas}</span>
+        {modoSayayin && <span>🔥 Quincena activa</span>}
       </div>
 
       <div
@@ -476,10 +620,14 @@ export default function CorreProfe() {
         onClick={tocarPantalla}
         style={{ backgroundImage: `url(${fondoActual})` }}
       >
-        <div className={`corre-profe-personaje ${accion}`}>
+        {flash && <div className="flash-efecto"></div>}
+        {modoSayayin && <div className="fondo-sayayin"></div>}
+        <div className={`corre-profe-personaje ${accion} ${modoSayayin ? "sayayin-activo" : ""}`}>
           <img
             src={
-              accion === "brincando"
+              modoSayayin
+                ? "/sayayin.png"
+                : accion === "brincando"
                 ? "/profe-brinca.png"
                 : accion === "agachado"
                 ? "/profe-agacha.png"
@@ -517,6 +665,16 @@ export default function CorreProfe() {
             style={{ transform: `translateX(${s.x}px)` }}
           >
             ⭐
+          </div>
+        ))}
+
+        {quincenas.map((q) => (
+          <div
+            key={q.id}
+            className="corre-profe-quincena"
+            style={{ transform: `translateX(${q.x}px)` }}
+          >
+            💰
           </div>
         ))}
 
