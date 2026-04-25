@@ -46,8 +46,17 @@ export default function CorreProfe() {
 
   const nivelActual = Math.floor(puntos / 200) + 1;
   const fondoActual = fondos[Math.floor((nivelActual - 1) / 2) % fondos.length];
+  const musicas = [
+  "/fondo-midi1.mp3",
+  "/fondo-midi2.mp3",
+  "/fondo-midi3.mp3",
+  "/fondo-midi4.mp3",
+  "/fondo-midi5.mp3",
+];
 
-  const abrirRanking = () => {
+const musicaActual = musicas[Math.floor((nivelActual - 1) / 2) % musicas.length];
+  
+const abrirRanking = () => {
     window.open(RANKING_URL, "_blank", "noopener,noreferrer");
   };
 
@@ -233,6 +242,17 @@ export default function CorreProfe() {
   }, [modoSayayin]);
 
   useEffect(() => {
+  if (musicaRef.current) {
+    musicaRef.current.pause();
+    musicaRef.current.currentTime = 0;
+
+    if (musicaIniciadaRef.current) {
+      musicaRef.current.play().catch(() => {});
+    }
+  }
+}, [musicaActual]);
+
+  useEffect(() => {
   const manejarVisibilidad = () => {
     if (!musicaRef.current) return;
 
@@ -247,7 +267,7 @@ export default function CorreProfe() {
   return () => {
     document.removeEventListener("visibilitychange", manejarVisibilidad);
   };
-}, []);
+}, [setPausado]);
 
   const elegirItem = useCallback((nivel, grupoTipo) => {
     const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
@@ -633,7 +653,7 @@ export default function CorreProfe() {
 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [crearObstaculo, crearCombo, crearEstrella, playSound, terminarJuego, activarSayayin]);
+  }, [crearObstaculo, crearCombo, crearEstrella, playSound, terminarJuego, activarSayayin, pausado]);
 
   const tocarPantalla = (e) => {
     const y = e.clientY || e.touches?.[0]?.clientY;
@@ -645,13 +665,7 @@ export default function CorreProfe() {
 
   return (
     <div className="corre-profe-game">
-      <audio ref={musicaRef} src="/fondo-midi.mp3" loop />
-
-      <h1>🎮 Corre Profe, Corre</h1>
-
-      <p className="corre-profe-descripcion">
-        Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.
-      </p>
+      <audio ref={musicaRef} src={musicaActual} loop />
 
       <div className="corre-profe-marcador">
         <span>Puntos: {puntos}</span>
