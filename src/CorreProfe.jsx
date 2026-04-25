@@ -9,6 +9,7 @@ export default function CorreProfe() {
 
   const [accion, setAccion] = useState("normal");
   const [puntos, setPuntos] = useState(0);
+  const [pausado, setPausado] = useState(false);
   const [record, setRecord] = useState(recordGuardado);
   const [nombreRecord, setNombreRecord] = useState(nombreGuardado);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -231,6 +232,23 @@ export default function CorreProfe() {
     modoSayayinRef.current = modoSayayin;
   }, [modoSayayin]);
 
+  useEffect(() => {
+  const manejarVisibilidad = () => {
+    if (!musicaRef.current) return;
+
+    if (document.hidden) {
+      setPausado(true);
+      musicaRef.current.pause();
+    }
+  };
+
+  document.addEventListener("visibilitychange", manejarVisibilidad);
+
+  return () => {
+    document.removeEventListener("visibilitychange", manejarVisibilidad);
+  };
+}, []);
+
   const elegirItem = useCallback((nivel, grupoTipo) => {
     const grupo = Math.floor((nivel - 1) / 2) % catalogos.length;
     const lista = catalogos[grupo][grupoTipo];
@@ -389,24 +407,46 @@ export default function CorreProfe() {
   }, [playSound]);
 
   const brincar = useCallback(() => {
-    if (gameOverRef.current) return reiniciar();
-    if (accionRef.current !== "normal") return;
+  if (gameOverRef.current) return reiniciar();
 
-    iniciarMusica();
-    playSound("jump");
-    setAccion("brincando");
-    setTimeout(() => setAccion("normal"), 700);
-  }, [iniciarMusica, playSound, reiniciar]);
+  if (pausado) {
+    setPausado(false);
+
+    if (musicaRef.current) {
+      musicaRef.current.play().catch(() => {});
+    }
+
+    return;
+  }
+
+  if (accionRef.current !== "normal") return;
+
+  iniciarMusica();
+  playSound("jump");
+  setAccion("brincando");
+  setTimeout(() => setAccion("normal"), 700);
+}, [iniciarMusica, playSound, reiniciar, pausado]);
 
   const agacharse = useCallback(() => {
-    if (gameOverRef.current) return reiniciar();
-    if (accionRef.current !== "normal") return;
+  if (gameOverRef.current) return reiniciar();
 
-    iniciarMusica();
-    playSound("duck");
-    setAccion("agachado");
-    setTimeout(() => setAccion("normal"), 500);
-  }, [iniciarMusica, playSound, reiniciar]);
+  if (pausado) {
+    setPausado(false);
+
+    if (musicaRef.current) {
+      musicaRef.current.play().catch(() => {});
+    }
+
+    return;
+  }
+
+  if (accionRef.current !== "normal") return;
+
+  iniciarMusica();
+  playSound("duck");
+  setAccion("agachado");
+  setTimeout(() => setAccion("normal"), 500);
+}, [iniciarMusica, playSound, reiniciar, pausado]);
 
   useEffect(() => {
     const tecla = (e) => {
@@ -426,7 +466,7 @@ export default function CorreProfe() {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
 
-      if (!gameOverRef.current) {
+      if (!gameOverRef.current && !pausado) {
         const nivel = Math.floor(scoreRef.current / 200) + 1;
 
         const velocidad =
