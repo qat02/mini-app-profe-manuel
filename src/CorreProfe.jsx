@@ -665,6 +665,13 @@ const abrirRanking = () => {
 
   return (
     <div className="corre-profe-game">
+      
+     <img 
+       src="/banner-profe.png" 
+       alt="El Profe vs el Mundo" 
+       className="banner-juego" 
+    />
+
       <audio ref={musicaRef} src={musicaActual} loop />
 
       <div className="corre-profe-marcador">

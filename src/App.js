@@ -11,6 +11,7 @@ function App() {
       '/section-directores.gif',
       '/section-docentes.gif',
       '/section-iaapps.gif',
+      '/section-juego.gif',
       '/section-recursos.gif',
       '/nav-directores.gif',
       '/nav-docentes.gif',
@@ -60,7 +61,7 @@ function App() {
       case 'recursos':
         return 'header-recursos';
       case 'juego':
-        return 'header-docentes';
+        return 'header-juegos';
       default:
         return 'header-home';
     }
@@ -94,9 +95,7 @@ function App() {
         };
       case 'juego':
         return {
-          gif: '/section-docentes.gif',
-          title: 'Corre Profe, Corre',
-          description: 'Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.',
+          gif: '/section-juego.gif',
         };
       default:
         return {
@@ -119,6 +118,8 @@ function App() {
         return 'card-iaapps';
       case 'recursos':
         return 'card-recursos';
+      case 'juegos':
+        return 'card-juegos';  
       default:
         return '';
     }
@@ -151,8 +152,8 @@ function App() {
         action: () => setScreen('recursos'),
       },
       {
-        title: 'Corre Profe, Corre',
-        description: 'Juego para sobrevivir a la carga administrativa y la jornada escolar.',
+        title: 'Mini Juegos',
+        description: 'Diviértete superando los retos.',
         image: '/icono-juego.png',
         action: () => setScreen('juego'),
       },
@@ -411,8 +412,8 @@ function App() {
                 <div className="section-card green" onClick={() => setScreen('juego')}>
                   <img src="/icono-juego.png" alt="Corre Profe Corre" className="section-card-image" />
                   <div className="section-card-body">
-                    <h3>Corre Profe, Corre</h3>
-                    <p>Ayuda al profe a sobrevivir a la carga administrativa y su jornada escolar.</p>
+                    <h3>Mini Juegos</h3>
+                    <p>Diviértete superando los retos.</p>
                   </div>
                 </div>
 
