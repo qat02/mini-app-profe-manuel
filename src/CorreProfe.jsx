@@ -369,13 +369,20 @@ export default function CorreProfe() {
     }
   }, [playSound, record]);
 
-  const reiniciar = useCallback(() => {
+  const reiniciar = useCallback((conMusica = false) => {
     playSound("restart");
 
     if (musicaRef.current) {
-      musicaRef.current.currentTime = 0;
-      musicaIniciadaRef.current = false;
-    }
+  musicaRef.current.currentTime = 0;
+
+  if (conMusica) {
+    musicaRef.current.volume = 0.2;
+    musicaRef.current.play().catch(() => {});
+    musicaIniciadaRef.current = true;
+  } else {
+    musicaIniciadaRef.current = false;
+  }
+}
 
     if (sayayinTimeoutRef.current) {
       clearTimeout(sayayinTimeoutRef.current);
@@ -407,7 +414,7 @@ export default function CorreProfe() {
   }, [playSound]);
 
   const brincar = useCallback(() => {
-  if (gameOverRef.current) return reiniciar();
+  if (gameOverRef.current) return reiniciar(true);
 
   if (pausado) {
     setPausado(false);
@@ -766,7 +773,7 @@ export default function CorreProfe() {
 
               <button onClick={abrirRanking}>🏆 Ver ranking</button>
 
-              <button onClick={reiniciar}>
+              <button onClick={() => reiniciar(true)}>
                 {nuevoRecord ? "Jugar otra vez" : "Reiniciar"}
               </button>
             </div>
