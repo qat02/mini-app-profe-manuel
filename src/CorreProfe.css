@@ -35,9 +35,9 @@
   border: 4px solid #333;
   border-radius: 18px;
   overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: 0px bottom;
+  background-repeat: repeat-x;
 }
 
 /* PERSONAJE */
@@ -50,7 +50,7 @@
 }
 
 .corre-profe-personaje img {
-  width: 110px;
+  width: 120px;
   height: auto;
   object-fit: contain;
 }
@@ -65,8 +65,12 @@
 }
 
 .corre-profe-personaje.agachado img {
-  width: 110px;
-  height: 75px;
+  width: 128px;
+  height: 88px;
+}
+
+.corre-profe-personaje.brincando img {
+  width: 135px;
 }
 
 /* OBSTÁCULOS */
@@ -83,7 +87,7 @@
 }
 
 .corre-profe-obstaculo.alto {
-  bottom: 72px;
+  bottom: 110px;
 }
 
 /* ESTRELLAS */
@@ -117,7 +121,8 @@
 /* 🔥 SALTO LIMPIO */
 @keyframes salto {
   0% { bottom: 18px; }
-  50% { bottom: 175px; }
+  40% { bottom: 210px; }
+  60% { bottom: 210px; }
   100% { bottom: 18px; }
 }
 
@@ -299,13 +304,15 @@
 
 /* MEDIO (igual que tu alto actual) */
 .obs-medio {
-  bottom: 50px;
+  bottom: 100px;
 }
 
 /* SUPERIOR (ligeramente arriba, NO al techo) */
 .obs-superior {
-  bottom: 90px;
-}/* 💰 QUINCENA / PODER */
+  bottom: 146px;
+}
+
+/* 💰 QUINCENA / PODER */
 .corre-profe-quincena {
   position: absolute;
   left: 0;
@@ -330,6 +337,7 @@
 
 /* El aura va en la imagen, no en el personaje, para no romper el salto */
 .corre-profe-personaje.sayayin-activo img {
+  width: 145px;
   animation: auraSayayinImg 0.35s infinite alternate;
 }
 

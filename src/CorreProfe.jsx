@@ -23,6 +23,9 @@ export default function CorreProfe() {
   const [estrellasTomadas, setEstrellasTomadas] = useState(0);
   const [bonoTotal, setBonoTotal] = useState(0);
   const [modoSayayin, setModoSayayin] = useState(false);
+  const [bgX, setBgX] = useState(0);
+  const [altura, setAltura] = useState(18);
+  const volandoRef = useRef(false);
 
   const accionRef = useRef("normal");
   const gameOverRef = useRef(false);
@@ -41,6 +44,7 @@ export default function CorreProfe() {
 
   const musicaRef = useRef(null);
   const musicaIniciadaRef = useRef(false);
+  const auraRef = useRef(null);
 
   const fondos = ["/fondo-1.png", "/fondo-2.png", "/fondo-3.png", "/fondo-4.png", "/fondo-5.png"];
 
@@ -69,31 +73,51 @@ const abrirRanking = () => {
   }, []);
 
   const activarSayayin = useCallback(() => {
-    const audio = new Audio("/sayayin.mp3");
-    audio.volume = 0.65;
-    audio.play().catch(() => {});
+  const audio = new Audio("/sayayin.mp3");
+  audio.volume = 1;
+  audio.playbackRate = 1.1;
+  audio.play().catch(() => {});
 
-    setFlash(true);
-    setTimeout(() => setFlash(false), 200);
+  const audio2 = new Audio("/sayayin.mp3");
+  audio2.volume = 0.6;
+  audio2.play().catch(() => {});
 
-    if (navigator.vibrate) {
-      navigator.vibrate(120);
+  setFlash(true);
+  setTimeout(() => setFlash(false), 200);
+
+  if (navigator.vibrate) {
+    navigator.vibrate(120);
+  }
+
+  setModoSayayin(true);
+  modoSayayinRef.current = true;
+  setEstrellas([]);
+
+  if (auraRef.current) {
+    auraRef.current.pause();
+    auraRef.current.currentTime = 0;
+  }
+
+  auraRef.current = new Audio("/sayayin-loop.mp3");
+  auraRef.current.loop = true;
+  auraRef.current.volume = 0.85;
+  auraRef.current.play().catch(() => {});
+
+  if (sayayinTimeoutRef.current) {
+    clearTimeout(sayayinTimeoutRef.current);
+  }
+
+  sayayinTimeoutRef.current = setTimeout(() => {
+    setModoSayayin(false);
+    modoSayayinRef.current = false;
+    starRef.current = 0;
+
+    if (auraRef.current) {
+      auraRef.current.pause();
+      auraRef.current.currentTime = 0;
     }
-
-    setModoSayayin(true);
-    modoSayayinRef.current = true;
-    setEstrellas([]);
-
-    if (sayayinTimeoutRef.current) {
-      clearTimeout(sayayinTimeoutRef.current);
-    }
-
-    sayayinTimeoutRef.current = setTimeout(() => {
-      setModoSayayin(false);
-      modoSayayinRef.current = false;
-      starRef.current = 0;
-    }, 7500);
-  }, []);
+  }, 7500);
+}, []);
 
   const playSound = useCallback((type) => {
     try {
@@ -500,6 +524,19 @@ const abrirRanking = () => {
           nivel <= 5
             ? 160 + nivel * 30
             : 360 + (nivel - 5) * 75;
+      
+      // 🔥 VUELO SAYAYIN
+      if (modoSayayinRef.current) {
+        setAltura((prev) => {
+          if (volandoRef.current) {
+            return Math.min(prev + 220 * dt, 220);
+         } else {
+           return Math.max(prev - 260 * dt, 18);
+         }
+       });
+     }      
+
+        setBgX((prev) => prev - velocidad * dt * 0.5);
 
         const intervalo =
           nivel <= 5
@@ -686,10 +723,15 @@ const abrirRanking = () => {
       <div
         className="corre-profe-escenario"
         onClick={tocarPantalla}
-        style={{ backgroundImage: `url(${fondoActual})` }}
+        style={{ 
+         backgroundImage: `url(${fondoActual})`,
+         backgroundPositionX: `${bgX}px`
+       }}
       >
+
         {flash && <div className="flash-efecto"></div>}
         {modoSayayin && <div className="fondo-sayayin"></div>}
+
         <div className={`corre-profe-personaje ${accion} ${modoSayayin ? "sayayin-activo" : ""}`}>
           <img
             src={
@@ -699,7 +741,7 @@ const abrirRanking = () => {
                 ? "/profe-brinca.png"
                 : accion === "agachado"
                 ? "/profe-agacha.png"
-                : "/profe-corre.png"
+                : "/profe-corre.gif"
             }
             alt="Profe"
           />
