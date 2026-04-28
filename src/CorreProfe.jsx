@@ -25,6 +25,7 @@ export default function CorreProfe() {
   const [modoSayayin, setModoSayayin] = useState(false);
   const [bgX, setBgX] = useState(0);
   const [altura, setAltura] = useState(18);
+  const [frame, setFrame] = useState(0);
   const volandoRef = useRef(false);
 
   const accionRef = useRef("normal");
@@ -256,6 +257,14 @@ const abrirRanking = () => {
   useEffect(() => {
     accionRef.current = accion;
   }, [accion]);
+
+  useEffect(() => {
+  const intervalo = setInterval(() => {
+    setFrame((prev) => (prev + 1) % 4);
+  }, 100);
+
+  return () => clearInterval(intervalo);
+  }, []);
 
   useEffect(() => {
     gameOverRef.current = gameOver;
@@ -699,6 +708,13 @@ const abrirRanking = () => {
     if (y < mitad) brincar();
     else agacharse();
   };
+  
+  const framesCorre = [
+  "/profe-corre1.png",
+  "/profe-corre2.png",
+  "/profe-corre3.png",
+  "/profe-corre4.png",
+  ];
 
   return (
     <div className="corre-profe-game">
@@ -741,7 +757,7 @@ const abrirRanking = () => {
                 ? "/profe-brinca.png"
                 : accion === "agachado"
                 ? "/profe-agacha.png"
-                : "/profe-corre.gif"
+                : framesCorre[frame]
             }
             alt="Profe"
           />
