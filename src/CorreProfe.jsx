@@ -710,11 +710,11 @@ const abrirRanking = () => {
   };
   
   const framesCorre = [
-  "/profe-corre1.png",
-  "/profe-corre2.png",
-  "/profe-corre3.png",
-  "/profe-corre4.png",
-  ];
+  "/profe-corre1.png?v=2",
+  "/profe-corre2.png?v=2",
+  "/profe-corre3.png?v=2",
+  "/profe-corre4.png?v=2",
+];
 
   return (
     <div className="corre-profe-game">
@@ -748,20 +748,23 @@ const abrirRanking = () => {
         {flash && <div className="flash-efecto"></div>}
         {modoSayayin && <div className="fondo-sayayin"></div>}
 
-        <div className={`corre-profe-personaje ${accion} ${modoSayayin ? "sayayin-activo" : ""}`}>
-          <img
-            src={
-              modoSayayin
-                ? "/sayayin.png"
-                : accion === "brincando"
-                ? "/profe-brinca.png"
-                : accion === "agachado"
-                ? "/profe-agacha.png"
-                : framesCorre[frame]
-            }
-            alt="Profe"
-          />
-        </div>
+        <div 
+  className={`corre-profe-personaje ${accion} ${modoSayayin ? "sayayin-activo" : ""}`}
+  style={{ transform: `translateY(-${altura}px)` }}
+>
+  <img
+    src={
+      modoSayayin
+        ? "/sayayin.png"
+        : accion === "brincando"
+        ? "/profe-brinca.png"
+        : accion === "agachado"
+        ? "/profe-agacha.png"
+        : framesCorre[frame]
+    }
+    alt="Profe"
+  />
+</div>
 
         {obstaculos.map((o) => (
           <div
