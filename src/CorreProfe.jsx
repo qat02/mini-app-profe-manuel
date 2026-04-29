@@ -27,6 +27,7 @@ export default function CorreProfe() {
   const [altura, setAltura] = useState(18);
   const [frame, setFrame] = useState(0);
   const volandoRef = useRef(false);
+  const frameTimerRef = useRef(0);
 
   const accionRef = useRef("normal");
   const gameOverRef = useRef(false);
@@ -528,6 +529,16 @@ const abrirRanking = () => {
 
       if (!gameOverRef.current && !pausado) {
         const nivel = Math.floor(scoreRef.current / 200) + 1;
+
+        // 🔥 ANIMACIÓN PRO
+frameTimerRef.current += dt;
+
+const velocidadFrame = Math.max(0.30 - nivel * 0.012, 0.14);
+
+if (frameTimerRef.current >= velocidadFrame) {
+  frameTimerRef.current = 0;
+  setFrame((prev) => (prev + 1) % 4);
+}
 
         const velocidad =
           nivel <= 5
